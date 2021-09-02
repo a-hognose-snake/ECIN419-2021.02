@@ -1,1 +1,3 @@
-print("Hola")
+from saludo import saludo
+
+saludo()

@@ -31,12 +31,12 @@ Construcción de un videojuego con un mínimo de 5 niveles. Debe incluir input, 
     │   ├── platform
     │   │   ├── __init__.py
 	│   │   └── Platform.py
-    │   ├── sql
-    │   │   ├── __init__.py
-	│   │   └── Connection.py
     │   ├── sound
     │   │   ├── __init__.py
 	│   │   └── example.mp4
+    │   ├── sql
+    │   │   ├── __init__.py
+	│   │   └── Connection.py
     │   └── main.py
 --------
 ### Diagrama de clases

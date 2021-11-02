@@ -16,22 +16,26 @@ class Character(pygame.sprite.Sprite):
         self.weapon.character = self
         self.salto = 10
 
-    def update(self) -> None:
+    def update(self, height: int) -> None:
         self.weapon.update()
         pressed = pygame.key.get_pressed()
         if pressed[pygame.K_UP]:
-            self.rect.y -= 4
+            self.rect.y -= 2
         elif pressed[pygame.K_DOWN]:
-            self.rect.y += 4
+            self.rect.y += 2
         else:
             self.rect.y += 0
         if pressed[pygame.K_LEFT]:
-            self.rect.x -= 4
+            self.rect.x -= 2
         elif pressed[pygame.K_RIGHT]:
-            self.rect.x += 4
+            self.rect.x += 2
         else:
             self.rect.x += 0
 
+        if self.rect.y <= 0:
+            self.rect.y = 0
+        if self.rect.y + self.rect.height >= height:
+            self.rect.y = height - self.rect.height
     def shoot(self):
         if self.weapon is not None:
             return self.weapon.shoot()

@@ -2,7 +2,7 @@
 
 ## Proyecto
 
-Construcción video juego multijugador con un mínimo de 5 niveles. Debe incluir input, manipulación de tiempo y colisiones.
+Construcción de un videojuego con un mínimo de 5 niveles. Debe incluir input, manipulación de tiempo y colisiones.
 
 ## Conocimiento necesarios:
 
@@ -11,4 +11,33 @@ Construcción video juego multijugador con un mínimo de 5 niveles. Debe incluir
 3. [Sprites](https://www.pygame.org/docs/ref/sprite.html "Sprites")
 4. Input del usuario
 5. Detección de colisiones
-6. Ignorar el archivo main por el momento
+
+## Diseño
+### Organización
+------------
+    ├── src
+    │   ├── bullet
+    │   │   ├── __init__.py
+	│   │   └── Bullet.py
+    │   ├── character
+    │   │   ├── __init__.py
+	│   │   └── Character.py
+    │   ├── enemy
+    │   │   ├── __init__.py
+	│   │   └── Enemy.py
+    │   ├── level
+    │   │   ├── __init__.py
+	│   │   └── Level.py
+    │   ├── platform
+    │   │   ├── __init__.py
+	│   │   └── Platform.py
+    │   ├── sql
+    │   │   ├── __init__.py
+	│   │   └── Connection.py
+    │   ├── sound
+    │   │   ├── __init__.py
+	│   │   └── example.mp4
+    │   └── main.py
+--------
+### Diagrama de clases
+![Diagrama de clases](img/Proyecto_PA.png)

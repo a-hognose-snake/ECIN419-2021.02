@@ -1,6 +1,5 @@
 import pygame
 from bullet.Bullet import Bullet
-from weapon.Weapon import Weapon
 from character.Character import Character
 from level.Level import Level
 
@@ -19,7 +18,7 @@ def main():
         salida = level.runnin_level()
         level.level_update(height)
         level.level_draw(screen)
-        level.collide_character_platform()
+        #level.collide_character_platform()
         pygame.display.flip()
         clock.tick(144)
         

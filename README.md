@@ -40,4 +40,4 @@ Construcción de un videojuego con un mínimo de 5 niveles. Debe incluir input, 
     │   └── main.py
 --------
 ### Diagrama de clases
-![Diagrama de clases](img/Proyecto_PA.png)
+![Diagrama de clases](img/Diagrama_de_clases.png)

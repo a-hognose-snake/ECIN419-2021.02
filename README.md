@@ -10,7 +10,7 @@ Construcción de un videojuego con un mínimo de 5 niveles. Debe incluir input, 
 2. [Manipulación del tiempo en el juego](https://www.pygame.org/docs/ref/time.html "Manipulación del tiempo en el juego")
 3. [Sprites](https://www.pygame.org/docs/ref/sprite.html "Sprites")
 4. Input del usuario
-5. [Detección de colisiones]((https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.spritecollideany)
+5. [Detección de colisiones](https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.spritecollideany)
 
 ## Diseño
 ### Organización

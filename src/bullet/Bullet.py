@@ -14,11 +14,11 @@ class Bullet(pygame.sprite.Sprite):
 
     def update(self) -> None:
         if self.direction == 'left':
-            self.rect.x -= 20
+            self.rect.x -= 10
             if self.rect.x == 0:
                 self.kill()
         elif self.direction == 'right':
-            self.rect.x += 20
+            self.rect.x += 10
             if self.rect.x ==1080:
                 self.kill()
 

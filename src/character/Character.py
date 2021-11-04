@@ -39,33 +39,31 @@ class Character(pygame.sprite.Sprite):
             else:
                 self.didJump = False
                 self.countJumps = 10
+        ###       
+        if pressed[pygame.K_f] and self.rect.y > - 10:
+            self.rect.y -= self.velocity
+            
+        ###
+        
+        if pressed[pygame.K_s] and self.rect.y < 720 - 64 - self.velocity:
+            self.rect.y += self.velocity
 
-        if pressed[pygame.K_s]:
-            self.rect.y += 2
-        else:
-            self.rect.y += 0
-
-        if pressed[pygame.K_a]:
+        if pressed[pygame.K_a] and self.rect.x > -21:
+            self.left = True
             self.right = False
             self.move_sprite('left', pressed)
-        elif pressed[pygame.K_d]:
+            
+        elif pressed[pygame.K_d] and self.rect.x < 1080 - 43 - self.velocity:
             self.left = False
+            self.right = True
             self.move_sprite('right', pressed)
         else:
-            self.right = False
-            self.left = False
-            self.rect.x += 0
             self.image = pygame.image.load(self.front[0])
-
-        if self.rect.y <= 0:
-            self.rect.y = 0
-        if self.rect.y + self.rect.height >= height:
-            self.rect.y = height - self.rect.height
 
     def move_sprite(self, pos, pressed):
         if pos == 'left':
             self.left = True
-            self.rect.x -= 2
+            self.rect.x -= self.velocity
             if not pressed[pygame.K_SPACE]:
                 self.image = pygame.image.load(self.left_move[0])
             else:
@@ -73,7 +71,7 @@ class Character(pygame.sprite.Sprite):
 
         if pos == 'right':
             self.right = True
-            self.rect.x += 2
+            self.rect.x += self.velocity
             if not pressed[pygame.K_SPACE]:
                 self.image = pygame.image.load(self.right_move[0])
             else:
@@ -100,4 +98,5 @@ class Character(pygame.sprite.Sprite):
     def calculate_score(self) -> int:
         if self.bullets_shoot == 0:
             return 0
-        return int((self.bullets_hit/self.bullets_shoot) * 100)
+        else:
+            return int((self.bullets_hit/self.bullets_shoot) * 100)

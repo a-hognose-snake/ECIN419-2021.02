@@ -18,10 +18,13 @@ class Level:
         self.cont = 0
         self.cant_enemys = level + 1
         self.generate_enemys()
+        self.game_over_c = False
+        self.game_win_c = False
 
         #ESCRIBIR EN PANTALLA
         self.font = pygame.font.Font("resources/fonts/minimal/Minimal3x5.ttf", 25)
-        self.whiteBlue = (20, 171, 245)
+        self.font_game_over = pygame.font.Font("resources/fonts/minimal/Minimal3x5.ttf", 55)
+        self.white_blue = (20, 171, 245)
 
     def generate_platform_map(self) -> pygame.sprite.Group:
         map = open(self.maps[self.level])
@@ -46,37 +49,47 @@ class Level:
 
     def generate_enemys(self):
         for i in range(self.cant_enemys):
-            self.enemy = Enemy((200, 700))
+            self.enemy = Enemy((100, 650))
             self.enemys.add(self.enemy)
 
-    def runnin_level(self) -> bool:
-        self.cont+=1
-        if self.cont == 50:
-            for e in self.enemys:
-                self.bullets_enemy.add(e.shoot())
-            self.cont = 0
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return True
-            keys = pygame.key.get_pressed()
-            if event.type == pygame.KEYDOWN:
-                if keys[pygame.K_SPACE]:
-                    character_shoot = self.character.shoot()
-                    if character_shoot:
-                        self.character.bullets_shoot += 1
-                        self.bullets.add(character_shoot)
+    def runnin_level(self, screen: pygame.Surface, height: int, width: int) -> bool:
 
-        if self.character_win():
-            pass
-        if not self.character.isAlive():
-            return True
+        clock = pygame.time.Clock()
+        while not self.game_over_c or not self.game_win_c:
+            self.cont+=1
+            if self.cont == 50:
+                for e in self.enemys:
+                    self.bullets_enemy.add(e.shoot())
+                self.cont = 0
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return True
+                keys = pygame.key.get_pressed()
+                if event.type == pygame.KEYDOWN:
+                    if keys[pygame.K_SPACE]:
+                        character_shoot = self.character.shoot()
+                        if character_shoot:
+                            self.character.bullets_shoot += 1
+                            self.bullets.add(character_shoot)
 
-        self.collide_bullet_with_enemy()
-        self.collide_character_with_enemy()
-        self.collide_bullet_with_character()
-        self.show_score()
-        pygame.display.update()
-        
+            self.level_update(height)
+            self.level_draw(screen)
+            self.collide_bullet_with_enemy()
+            self.collide_character_with_enemy()
+            self.collide_bullet_with_character()
+            self.show_score()
+
+            if self.character_win():
+                self.game_win()
+                self.game_win_c = True
+                return self.game_win_c
+            if not self.character.isAlive():
+                self.game_over()
+                self.game_over_c = True
+                return self.game_over_c
+
+            clock.tick(60)
+            pygame.display.update()
 
     def level_update(self, height: int):
         self.character.update(height)
@@ -93,7 +106,8 @@ class Level:
         self.bullets.draw(screen)
         self.bullets_enemy.draw(screen)
         #self.platform.draw(screen)
-
+        
+    #No esta terminado
     def collide_character_with_platform(self):
         platform: Platform = pygame.sprite.spritecollideany(self.character, self.platform)
         pressed = pygame.key.get_pressed()
@@ -135,5 +149,29 @@ class Level:
 
     def show_score(self):
         if self.screen is not None:
-            text = self.font.render("SCORE: " + str(self.character.calculate_score()), True, self.whiteBlue)
+            text = self.font.render("SCORE: " + str(self.character.calculate_score()), True,(0,0,0))
             self.screen.blit(text, (975, 690))
+
+    def game_over(self):
+        exit_lost = False
+        while not exit_lost:
+            if self.cant_enemys > 0:
+                for e in self.enemys:
+                    e.kill()
+            text = self.font_game_over.render("You Lose!!  Score: " + str(self.character.calculate_score()), True, (0,0,0))
+            self.screen.blit(text, ((1080/2)-210, (720/2)-90))
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    exit_lost = True
+            pygame.display.update()
+
+    def game_win(self):
+        exit_game_win = False
+        while not exit_game_win:
+            text = self.font_game_over.render("Win!!  Score: " + str(self.character.calculate_score()), True, (0,0,0))
+            self.screen.blit(text, ((1080/2)-210, (720/2)-90))
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    exit_game_win = True
+            pygame.display.update()

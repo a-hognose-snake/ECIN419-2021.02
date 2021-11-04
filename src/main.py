@@ -18,12 +18,13 @@ def main():
         salida = level.runnin_level()
         level.level_update(height)
         level.level_draw(screen)
+        level.collide_bullet_with_character()
         #level.collide_character_platform()
         pygame.display.flip()
-        clock.tick(144)
-        
-
+        clock.tick(60)
     pygame.quit()
+
+
 main()
 print("FIN")
 exit()

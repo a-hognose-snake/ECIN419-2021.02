@@ -6,15 +6,22 @@ from enemy.Enemy import Enemy
 class Level:
     def __init__(self, character: Character, level: int) -> None:
         self.character = character
-        self.maps = ['src/level/map_1.txt', 'src/level/map_2.txt']
-        self.path_background = ['src/level/background_1.jpg', 'src/level/background_2.jpg', 'src/level/background_3.jpg', 'src/level/background_4.jpg']
+        self.maps = ['resources/images/level/map_1.txt', 'resources/images/level/map_2.txt']
+        self.path_background = ['resources/images/level/background_1.jpg', 'resources/images/level/background_2.jpg', 'resources/images/level/background_3.jpg', 'resources/images/level/background_4.jpg']
         self.level = level
+        self.screen = None
         self.platform = self.generate_platform_map()
-        self.background = pygame.image.load(self.path_background[level])
+        self.background = pygame.transform.scale(pygame.image.load(self.path_background[level]), (1080, 720))
         self.bullets = pygame.sprite.Group()   
         self.bullets_enemy = pygame.sprite.Group()
-        self.enemy = Enemy((200, 200))
+        self.enemys = pygame.sprite.Group()
         self.cont = 0
+        self.cant_enemys = level + 1
+        self.generate_enemys()
+
+        #ESCRIBIR EN PANTALLA
+        self.font = pygame.font.Font("resources/fonts/minimal/Minimal3x5.ttf", 25)
+        self.whiteBlue = (20, 171, 245)
 
     def generate_platform_map(self) -> pygame.sprite.Group:
         map = open(self.maps[self.level])
@@ -37,50 +44,57 @@ class Level:
             y += 15
         return self.platform_aux
 
+    def generate_enemys(self):
+        for i in range(self.cant_enemys):
+            self.enemy = Enemy((200, 700))
+            self.enemys.add(self.enemy)
+
     def runnin_level(self) -> bool:
         self.cont+=1
         if self.cont == 50:
+            for e in self.enemys:
+                self.bullets_enemy.add(e.shoot())
             self.cont = 0
-            self.bullets_enemy.add(self.enemy.shoot())
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return True
             keys = pygame.key.get_pressed()
             if event.type == pygame.KEYDOWN:
                 if keys[pygame.K_SPACE]:
-                    self.bullets.add(self.character.shoot())
+                    character_shoot = self.character.shoot()
+                    if character_shoot:
+                        self.character.bullets_shoot += 1
+                        self.bullets.add(character_shoot)
 
-        pressed = pygame.key.get_pressed()
-        if pressed[pygame.K_UP]:
-            self.character.rect.y -= 5
-        if pressed[pygame.K_DOWN]:
-            self.character.rect.y += 5    
-        if pressed[pygame.K_LEFT]:
-            self.character.rect.x -= 5
-        else:
-            self.character.rect.x += 0
-        if pressed[pygame.K_RIGHT]:
-            self.character.rect.x += 5
-        else:
-            self.character.rect.x += 0
-        return False
+        if self.character_win():
+            pass
+        if not self.character.isAlive():
+            return True
+
+        self.collide_bullet_with_enemy()
+        self.collide_character_with_enemy()
+        self.collide_bullet_with_character()
+        self.show_score()
+        pygame.display.update()
+        
 
     def level_update(self, height: int):
         self.character.update(height)
         self.bullets.update()
-        self.enemy.update()
+        self.enemys.update(height)
         self.bullets_enemy.update()
         #self.platform.update()
 
     def level_draw(self, screen: pygame.Surface):
+        self.screen = screen
         screen.blit(self.background, (0,0))
         screen.blit(self.character.image, self.character.rect)
-        screen.blit(self.enemy.image, self.enemy.rect)
+        self.enemys.draw(screen)
         self.bullets.draw(screen)
         self.bullets_enemy.draw(screen)
         #self.platform.draw(screen)
 
-    def collide_character_platform(self):
+    def collide_character_with_platform(self):
         platform: Platform = pygame.sprite.spritecollideany(self.character, self.platform)
         pressed = pygame.key.get_pressed()
         up = False
@@ -93,7 +107,33 @@ class Level:
 
     def collide_bullet_with_character(self):
         bullet = pygame.sprite.spritecollideany(self.character, self.bullets_enemy)
-        print(self.character.health)
         if bullet:
             self.character.health -= 10
             bullet.kill()
+
+    def collide_bullet_with_enemy(self):
+        enemy = pygame.sprite.groupcollide(self.bullets, self.enemys, True, False)
+        if enemy:
+            for key, values in enemy.items():
+                enemy_c = enemy[key][0]
+                enemy_c.health -= 10
+                if enemy_c.health == 0:
+                    enemy_c.kill()
+                    self.cant_enemys -= 1
+            self.character.bullets_hit += 1
+    
+    def collide_character_with_enemy(self):
+        if pygame.sprite.spritecollideany(self.character, self.enemys):
+            self.character.health -= 10
+            if self.character.right:
+                self.character.rect.x -= 20
+            if self.character.left:
+                self.character.rect.x += 20
+
+    def character_win(self) -> bool:
+        return self.character.isAlive() and self.cant_enemys == 0
+
+    def show_score(self):
+        if self.screen is not None:
+            text = self.font.render("SCORE: " + str(self.character.calculate_score()), True, self.whiteBlue)
+            self.screen.blit(text, (975, 690))

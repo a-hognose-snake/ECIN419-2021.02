@@ -39,11 +39,9 @@ class Character(pygame.sprite.Sprite):
             else:
                 self.didJump = False
                 self.countJumps = 10
-        ###       
+                 
         if pressed[pygame.K_f] and self.rect.y > - 10:
             self.rect.y -= self.velocity
-            
-        ###
         
         if pressed[pygame.K_s] and self.rect.y < 720 - 64 - self.velocity:
             self.rect.y += self.velocity

@@ -154,10 +154,10 @@ class Level:
 
     def game_over(self):
         exit_lost = False
+        if self.cant_enemys > 0:
+            for e in self.enemys:
+                e.kill()
         while not exit_lost:
-            if self.cant_enemys > 0:
-                for e in self.enemys:
-                    e.kill()
             text = self.font_game_over.render("You Lose!!  Score: " + str(self.character.calculate_score()), True, (0,0,0))
             self.screen.blit(text, ((1080/2)-210, (720/2)-90))
 

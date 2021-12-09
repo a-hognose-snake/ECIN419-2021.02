@@ -72,6 +72,11 @@ class Level:
                             self.character.bullets_shoot += 1
                             self.bullets.add(character_shoot)
 
+            #print(f'Posicion actual character  x: {self.character.rect.x} y: {self.character.rect.y}')
+            platform_aux = pygame.sprite.spritecollideany(self.character, self.platform)
+            if platform_aux:
+                self.collide_platform(platform_aux)
+
             self.level_update(height)
             self.level_draw(screen)
             self.collide_bullet_with_enemy()
@@ -96,7 +101,7 @@ class Level:
         self.bullets.update()
         self.enemys.update(height)
         self.bullets_enemy.update()
-        #self.platform.update()
+        self.platform.update()
 
     def level_draw(self, screen: pygame.Surface):
         self.screen = screen
@@ -105,7 +110,7 @@ class Level:
         self.enemys.draw(screen)
         self.bullets.draw(screen)
         self.bullets_enemy.draw(screen)
-        #self.platform.draw(screen)
+        self.platform.draw(screen)
         
     #No esta terminado
     def collide_character_with_platform(self):
@@ -175,3 +180,13 @@ class Level:
                 if event.type == pygame.QUIT:
                     exit_game_win = True
             pygame.display.update()
+
+    def collide_platform(self, platform_aux: Platform):
+        print(f'posision character: {self.character.rect.y} + {self.character.rect.height}')
+        floor = self.character.rect.y + (self.character.rect.height/2)
+        platform = platform_aux
+        if floor < platform.rect.y + platform.rect.height and self.character.platform != platform:
+            print('ESTA ARRIBA')
+            self.character.platform = platform
+            self.character.rect.y = (platform.rect.y - (self.character.rect.height + 4))
+            #self.character.didJump = False

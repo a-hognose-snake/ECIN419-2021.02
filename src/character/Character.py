@@ -9,13 +9,14 @@ class Character(pygame.sprite.Sprite):
         self.left_move = ["resources/images/character/3.png", "resources/images/character/4.png"]
         self.right_move = ["resources/images/character/1.png", "resources/images/character/0.png"]
         self.image = pygame.image.load(self.front[0])
+        self.image = pygame.transform.scale(self.image, (64, 64))
         self.rect = self.image.get_rect()
         self.position = position
         self.rect.topleft = position
         self.health = 100
         self.left = False
         self.right = False
-
+        self.platform = None
         self.velocity = 5
         self.didJump = False
         self.countJumps = 10
@@ -23,10 +24,9 @@ class Character(pygame.sprite.Sprite):
         self.bullets_shoot = 0 #contador de balas lanzadas
         self.bullets_hit = 0 #contador de balas acertadas
 
-    def update(self, height: int) -> None:
+    def jump(self):
         pressed = pygame.key.get_pressed()
-
-        if self.didJump == False:
+        if not self.didJump:
             if pressed[pygame.K_w]:
                 self.didJump = True
         else:
@@ -39,7 +39,10 @@ class Character(pygame.sprite.Sprite):
             else:
                 self.didJump = False
                 self.countJumps = 10
-                 
+    
+    def update(self, height: int) -> None:
+        self.jump()
+        pressed = pygame.key.get_pressed()
         if pressed[pygame.K_f] and self.rect.y > - 10:
             self.rect.y -= self.velocity
         
@@ -57,6 +60,7 @@ class Character(pygame.sprite.Sprite):
             self.move_sprite('right', pressed)
         else:
             self.image = pygame.image.load(self.front[0])
+            self.image = pygame.transform.scale(self.image, (64, 64))
 
     def move_sprite(self, pos, pressed):
         if pos == 'left':
@@ -64,16 +68,20 @@ class Character(pygame.sprite.Sprite):
             self.rect.x -= self.velocity
             if not pressed[pygame.K_SPACE]:
                 self.image = pygame.image.load(self.left_move[0])
+                self.image = pygame.transform.scale(self.image, (64, 64))
             else:
                 self.image = pygame.image.load(self.left_move[1])
+                self.image = pygame.transform.scale(self.image, (64, 64))
 
         if pos == 'right':
             self.right = True
             self.rect.x += self.velocity
             if not pressed[pygame.K_SPACE]:
                 self.image = pygame.image.load(self.right_move[0])
+                self.image = pygame.transform.scale(self.image, (64, 64))
             else:
                 self.image = pygame.image.load(self.right_move[1])
+                self.image = pygame.transform.scale(self.image, (64, 64))
     
     def shoot(self):
         bullet = Bullet((self.rect.x+30, self.rect.y+35))

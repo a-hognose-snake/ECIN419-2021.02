@@ -3,6 +3,7 @@ from platform.Platform import Platform
 from character.Character import Character
 from enemy.Enemy import Enemy
 
+GRAVEDAD = 9
 class Level:
     def __init__(self, character: Character, level: int) -> None:
         self.character = character
@@ -49,7 +50,7 @@ class Level:
 
     def generate_enemys(self):
         for i in range(self.cant_enemys):
-            self.enemy = Enemy((100, 650))
+            self.enemy = Enemy((100, 669))
             self.enemys.add(self.enemy)
 
     def runnin_level(self, screen: pygame.Surface, height: int, width: int) -> bool:
@@ -72,10 +73,39 @@ class Level:
                             self.character.bullets_shoot += 1
                             self.bullets.add(character_shoot)
 
-            #print(f'Posicion actual character  x: {self.character.rect.x} y: {self.character.rect.y}')
             platform_aux = pygame.sprite.spritecollideany(self.character, self.platform)
             if platform_aux:
                 self.collide_platform(platform_aux)
+            else:
+                self.character.state_y = 'falling'
+
+            if self.character.state_y == 'falling':
+                self.character.velocity_y = self.character.falling_timer * GRAVEDAD
+                self.character.rect.y += self.character.velocity_y
+                self.character.falling_timer += 0.15
+            elif self.character.state_y == 'jumping':
+                self.character.velocity_y = (self.character.jump_timer / 15.0) * -GRAVEDAD
+                self.character.jump_timer -= 1
+            elif self.character.state_y == 'standing':
+                self.character.velocity_y = 0
+                self.character.jump_timer = 30
+                self.character.falling_timer = 0
+            """
+            if self.character.state_y == 'standing':
+                self.character.velocity_y = 1
+                ground = self.character.rect.bottom > 1080 """
+
+
+            if self.character.rect.left < 0:
+                self.character.rect.left = 0
+            elif self.character.rect.right > 1080:
+                self.character.rect.right = 1080
+            if self.character.rect.top < 0:
+                self.character.rect.top = 0
+            elif self.character.rect.bottom > 720:
+                self.character.rect.bottom = 720
+                self.character.state_y = 'standing'
+
 
             self.level_update(height)
             self.level_draw(screen)
@@ -182,11 +212,9 @@ class Level:
             pygame.display.update()
 
     def collide_platform(self, platform_aux: Platform):
-        print(f'posision character: {self.character.rect.y} + {self.character.rect.height}')
-        floor = self.character.rect.y + (self.character.rect.height/2)
-        platform = platform_aux
-        if floor < platform.rect.y + platform.rect.height and self.character.platform != platform:
-            print('ESTA ARRIBA')
-            self.character.platform = platform
-            self.character.rect.y = (platform.rect.y - (self.character.rect.height + 4))
-            #self.character.didJump = False
+        if self.character.state_y == 'falling':
+            self.character.rect.bottom = platform_aux.rect.top
+            self.character.state_y = 'standing'
+
+        elif self.character.state_y == 'jumping':
+            self.character.rect.top = platform_aux.rect.bottom

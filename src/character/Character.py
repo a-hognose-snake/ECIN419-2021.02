@@ -17,8 +17,13 @@ class Character(pygame.sprite.Sprite):
         self.right = False
         self.platform = None
         self.velocity = 5
+        self.velocity_y = 0
         self.didJump = False
         self.countJumps = 10
+
+        self.falling_timer = 0
+        self.state_y = 'falling'
+        self.jump_timer = 0
 
         self.bullets_shoot = 0 #contador de balas lanzadas
         self.bullets_hit = 0 #contador de balas acertadas
@@ -27,7 +32,9 @@ class Character(pygame.sprite.Sprite):
         pressed = pygame.key.get_pressed()
         if not self.didJump:
             if pressed[pygame.K_w]:
+                self.state_y = 'jumping'
                 self.didJump = True
+                    
         else:
             if self.countJumps >= -10:
                 neg = 1
@@ -37,13 +44,24 @@ class Character(pygame.sprite.Sprite):
                 self.countJumps -= 2
             else:
                 self.didJump = False
+                self.state_y == 'falling'
                 self.countJumps = 10
     
     def update(self, height: int) -> None:
-        self.jump()
+        print(self.state_y)
+        #self.jump()
         pressed = pygame.key.get_pressed()
-        if pressed[pygame.K_f] and self.rect.y > - 10:
-            self.rect.y -= self.velocity
+        if pressed[pygame.K_w]:
+            if self.state_y == 'standing':
+                self.state_y = 'jumping'
+        else:
+            if self.state_y == 'jumping':
+                self.state_y = 'falling'
+        if self.jump_timer <= 0:
+            self.state_y = 'falling'
+
+        """         if pressed[pygame.K_f] and self.rect.y > - 10:
+            self.rect.y -= self.velocity_y """
         
         if pressed[pygame.K_s] and self.rect.y < 720 - 64 - self.velocity:
             self.rect.y += self.velocity

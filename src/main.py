@@ -14,7 +14,7 @@ def main():
     screen = pygame.display.set_mode((width, height))
     clock = pygame.time.Clock()
     screen.fill((255, 255, 255))
-    character = Character((0,684))
+    character = Character((0,200))
     exit_game = False
     level = Level(character, 0)
     continue_game = False
@@ -28,7 +28,7 @@ def main():
                     exit_game = True
                 if keys[pygame.K_i]:
                     if continue_game:
-                        character = Character((-18, 648))
+                        character = Character((0,200))
                         level = Level(character, 0)
                         continue_game = level.runnin_level(screen, height, width)
                     else:

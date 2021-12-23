@@ -14,7 +14,7 @@ def main():
     screen = pygame.display.set_mode((width, height))
     clock = pygame.time.Clock()
     screen.fill((255, 255, 255))
-    character = Character((-18, 648))
+    character = Character((0,684))
     exit_game = False
     level = Level(character, 0)
     continue_game = False

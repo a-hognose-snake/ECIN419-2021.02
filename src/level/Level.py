@@ -85,13 +85,10 @@ class Level:
                 self.character.rect.y += self.character.velocity_y
                 self.character.falling_timer += 0.15
             elif self.character.state_y == 'jumping':
-                print(f'{self.character.state_y} -- {self.character.rect.y}')
-                self.character.velocity_y = (self.character.jump_timer / 5.0) * -GRAVEDAD
                 self.character.jump()
-                self.character.jump_timer -= 1
             elif self.character.state_y == 'standing':
                 self.character.velocity_y = 0
-                self.character.jump_timer = 30
+                self.character.jump_timer = 40
                 self.character.falling_timer = 0
 
             if self.character.rect.left < 0:

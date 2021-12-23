@@ -74,6 +74,7 @@ class Level:
                             self.bullets.add(character_shoot)
 
             platform_aux = pygame.sprite.spritecollideany(self.character, self.platform)
+            print(f'{self.character.state_y} -- {self.character.rect.y}')
             if platform_aux:
                 self.collide_platform(platform_aux)
             else:
@@ -84,17 +85,14 @@ class Level:
                 self.character.rect.y += self.character.velocity_y
                 self.character.falling_timer += 0.15
             elif self.character.state_y == 'jumping':
-                self.character.velocity_y = (self.character.jump_timer / 15.0) * -GRAVEDAD
+                print(f'{self.character.state_y} -- {self.character.rect.y}')
+                self.character.velocity_y = (self.character.jump_timer / 5.0) * -GRAVEDAD
+                self.character.jump()
                 self.character.jump_timer -= 1
             elif self.character.state_y == 'standing':
                 self.character.velocity_y = 0
                 self.character.jump_timer = 30
                 self.character.falling_timer = 0
-            """
-            if self.character.state_y == 'standing':
-                self.character.velocity_y = 1
-                ground = self.character.rect.bottom > 1080 """
-
 
             if self.character.rect.left < 0:
                 self.character.rect.left = 0
@@ -123,7 +121,7 @@ class Level:
                 self.game_over_c = True
                 return self.game_over_c
 
-            clock.tick(60)
+            clock.tick(75)
             pygame.display.update()
 
     def level_update(self, height: int):
@@ -213,8 +211,8 @@ class Level:
 
     def collide_platform(self, platform_aux: Platform):
         if self.character.state_y == 'falling':
-            self.character.rect.bottom = platform_aux.rect.top
+            self.character.rect.bottom = platform_aux.rect.top+1
             self.character.state_y = 'standing'
 
         elif self.character.state_y == 'jumping':
-            self.character.rect.top = platform_aux.rect.bottom
+            self.character.rect.bottom = platform_aux.rect.top+1

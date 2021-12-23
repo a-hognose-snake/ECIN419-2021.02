@@ -28,7 +28,7 @@ class Character(pygame.sprite.Sprite):
         self.bullets_shoot = 0 #contador de balas lanzadas
         self.bullets_hit = 0 #contador de balas acertadas
 
-    def jump(self):
+    """ def jump(self):
         pressed = pygame.key.get_pressed()
         if not self.didJump:
             if pressed[pygame.K_w]:
@@ -44,19 +44,24 @@ class Character(pygame.sprite.Sprite):
                 self.countJumps -= 2
             else:
                 self.didJump = False
-                self.state_y == 'falling'
-                self.countJumps = 10
-    
+                #self.state_y == 'falling'
+                self.countJumps = 10 """
+    def jump(self):
+        self.rect.y += self.velocity_y
+
     def update(self, height: int) -> None:
-        print(self.state_y)
         #self.jump()
         pressed = pygame.key.get_pressed()
         if pressed[pygame.K_w]:
             if self.state_y == 'standing':
+                print('a')
                 self.state_y = 'jumping'
+                print(self.state_y)
         else:
             if self.state_y == 'jumping':
+                print('b')
                 self.state_y = 'falling'
+                print(self.state_y)
         if self.jump_timer <= 0:
             self.state_y = 'falling'
 
@@ -112,6 +117,9 @@ class Character(pygame.sprite.Sprite):
             self.kill()
             return True
         return False
+        
+    def collide(self, other):
+        return self.rect.colliderect(other)
 
     def calculate_score(self) -> int:
         if self.bullets_shoot == 0:

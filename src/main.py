@@ -52,7 +52,7 @@ def main():
         pygame.display.update()
         #level.collide_character_platform()
 
-        clock.tick(60)
+        clock.tick(75)
     pygame.quit()
 
 

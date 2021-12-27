@@ -1,70 +1,57 @@
 import pygame
 from bullet.Bullet import Bullet
+from constant.constant import *
 
 class Enemy(pygame.sprite.Sprite):
     """Enemigos del juego.
     """
-    def __init__(self, position: tuple) -> None:
+    def __init__(self, position: tuple, images: tuple) -> None:
         super().__init__()
-        self.image = pygame.image.load("resources/images/enemy/7.png")
+        self.images = images
+        self.image = pygame.image.load(images[1])
         self.rect = self.image.get_rect()
         self.position = position
         self.rect.topleft = position
         self.health = 100
         
-        self.path = [200, 720]
-        self.countSteps = 0
+        self.limit_left = -1
+        self.limit_right = -1
         self.velocity = 3
         self.left = False
-        self.right = False
+        self.right = True
 
-    def update(self, height: int):
+    def update(self):
         self.move()
-        if self.countSteps + 1 >= (3 * 4):
-            self.countSteps = 0
-            
-        if self.velocity > 0:
-            # walkRight
-            self.countSteps += 1
-        else:
-            # walkLeft 
-            self.countSteps += 1
 
 
     def move(self):
         """Actualiza los Sprite del enemigo en base a la velocidad.
         """
-        if self.velocity > 0:
-            # if we are moving right
-            if self.rect.x < self.path[1] + self.velocity:
-                self.left = False
-                self.right = True
-                # if we are not at the end of the path, keep moving
-                self.image = pygame.image.load("resources/images/enemy/7.png")
-                self.rect.x += self.velocity
-            else:
-                self.left = True
-                self.right = False
-                # else, change direction and move back the other way
-                self.image = pygame.image.load("resources/images/enemy/4.png")
-                self.velocity = self.velocity * -1
-                self.rect.x += self.velocity
-                self.countSteps = 0
-        else:
-            # if we are moving left
-            if self.rect.x > self.path[0] - self.velocity:
-                self.left = True
-                self.right = False
-                self.image = pygame.image.load("resources/images/enemy/4.png")
-                # if we are not at the end of the path, keep moving
-                self.rect.x += self.velocity
-            else:  # else, change direction
-                self.left = False
-                self.right = True
-                self.image = pygame.image.load("resources/images/enemy/7.png")
-                self.velocity = self.velocity * -1
-                self.rect.x += self.velocity
-                self.countSteps = 0
+        if self.right and not self.left:
+            self.image = pygame.image.load(self.images[1])
+            self.rect.x += self.velocity
+        elif self.left and not self.right:
+            self.image = pygame.image.load(self.images[0])
+            self.rect.x -= self.velocity
+
+        if self.rect.x > WIDTH:
+            self.right = False
+            self.left = True
+            self.rect.right = WIDTH
+        if self.rect.x > self.limit_right:
+            self.right = False
+            self.left = True
+            self.rect.right = self.limit_right
+        
+        if self.rect.x < self.limit_left:
+            self.left = False
+            self.right = True
+            self.rect.x = self.limit_left
+        if self.rect.left < 0:
+            self.left = False
+            self.right = True
+
+            self.rect.left = 0
                 
 
     def shoot(self):

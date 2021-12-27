@@ -2,40 +2,32 @@ import pygame
 from bullet.Bullet import Bullet
 from character.Character import Character
 from level.Level import Level
+from constant.constant import *
 
-pygame.init()
-
-FONT_SMALL = pygame.font.SysFont("comicsansms", 20)
-
-def start_text(screen, background):
+def start_text(background):
     """ Imprime el texto de inicio.
 
     Parameters
     ----------
-    screen: Surface
-        Pantalla del juego.
     background: Surface
         Fondo del juego.
     
     """
-    screen.blit(background, (0,0))
+    SCREEN.blit(background, (0,0))
     init_text = FONT_SMALL.render(
             "Press 'I' to START", True, (255, 255, 255))
-    screen.blit(init_text, (600, 680))
+    SCREEN.blit(init_text, (600, 680))
     exit_text = FONT_SMALL.render(
             "Press 'E' to EXIT", True, (255, 255, 255))
-    screen.blit(exit_text, (270, 680))
+    SCREEN.blit(exit_text, (270, 680))
 
 def main():
     """Función principal.
     """
     background = pygame.image.load("resources/images/level/init.jpg")
-    width = 1080
-    height = 720
-    background = pygame.transform.scale(background, (width, height))
-    screen = pygame.display.set_mode((width, height))
+    background = pygame.transform.scale(background, (WIDTH, HEIGHT))
     clock = pygame.time.Clock()
-    screen.fill((255, 255, 255))
+    SCREEN.fill((255, 255, 255))
     character = Character((0,200))
     exit_game = False
     level = Level(character, 0)
@@ -52,14 +44,14 @@ def main():
                     if continue_game:
                         character = Character((0,200))
                         level = Level(character, 0)
-                        continue_game = level.runnin_level(screen, height, width)
+                        continue_game = level.runnin_level()
                     else:
-                        continue_game = level.runnin_level(screen, height, width)
+                        continue_game = level.runnin_level()
 
-        start_text(screen, background)
+        start_text(background)
         pygame.display.update()
 
-        clock.tick(75)
+        clock.tick(FPS)
     pygame.quit()
 
 

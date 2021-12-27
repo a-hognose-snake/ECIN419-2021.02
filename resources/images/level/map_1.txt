@@ -21,26 +21,26 @@
                                                                 
   
 
-
-                        LMMMMMMMMMMMMMMMMMMR
-                                                                
-
-
+                                        l           r 1
+                                        LMMMMMMMMMMMR
+LMMMMMMMMMMMMMMMMMMR                                                               
 
 
-  LMMMMMMMMMMMMMMMMMMMR                                                                 
-                                                                
 
+
+                                                             
+l                   r 1               l           r 1
+LMMMMMMMMMMMMMMMMMMMR                 LMMMMMMMMMMMR                             
 
   
-                                                                
-                        LMMMMMR
+                                  LMR                                
+
+                                                        
+
+                          LMMMR
+
                                                                 
 
-
-
-                                                                
-  LMMMMMMMMMMMMMMMMMMMMMMMMMR
 
 
 

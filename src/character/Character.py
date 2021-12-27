@@ -38,7 +38,7 @@ class Character(pygame.sprite.Sprite):
         self.jump_timer -= 0.5
         self.rect.y += self.velocity_y
 
-    def update(self, height: int) -> None:
+    def update(self) -> None:
         pressed = pygame.key.get_pressed()
         if pressed[pygame.K_w]:
             if self.state_y == 'standing':

@@ -2,6 +2,8 @@ import pygame
 
 
 class Bullet(pygame.sprite.Sprite):
+    """Bala disparada por el jugador/enemigo.
+    """
     def __init__(self, position: tuple) -> None:
         super().__init__()
         self.image = pygame.image.load(

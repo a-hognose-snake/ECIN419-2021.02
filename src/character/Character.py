@@ -3,6 +3,8 @@ from bullet.Bullet import Bullet
 
 
 class Character(pygame.sprite.Sprite):
+    """Personaje principal.
+    """
     def __init__(self, position: tuple) -> None:
         super().__init__()
         self.front = ["resources/images/character/2.png"]
@@ -29,6 +31,9 @@ class Character(pygame.sprite.Sprite):
         self.bullets_hit = 0 #contador de balas acertadas
 
     def jump(self):
+        """Calcula y realiza el salto del jugador.
+        
+        """
         self.velocity_y = (self.jump_timer / 3.0) * -9
         self.jump_timer -= 0.5
         self.rect.y += self.velocity_y
@@ -59,8 +64,18 @@ class Character(pygame.sprite.Sprite):
         else:
             self.image = pygame.image.load(self.front[0])
 
-    def move_sprite(self, pos, pressed):
-        if pos == 'left':
+    def move_sprite(self, direction: str, pressed):
+        """Actualiza los Sprite del personaje.
+
+        Parameters
+        ----------
+        direction: str
+            Dirección donde se esta moviendo el personaje.
+        pressed: Sequence
+            Lista de teclas que pueden ser presionadas. 
+
+        """
+        if direction == 'left':
             self.left = True
             self.rect.x -= self.velocity
             if not pressed[pygame.K_SPACE]:
@@ -68,7 +83,7 @@ class Character(pygame.sprite.Sprite):
             else:
                 self.image = pygame.image.load(self.left_move[1])
 
-        if pos == 'right':
+        if direction == 'right':
             self.right = True
             self.rect.x += self.velocity
             if not pressed[pygame.K_SPACE]:
@@ -77,6 +92,13 @@ class Character(pygame.sprite.Sprite):
                 self.image = pygame.image.load(self.right_move[1])
     
     def shoot(self):
+        """Realiza un disparo.
+
+        Returns
+        -------
+        bullet: Bullet
+            Bala del disparo.
+        """
         bullet = Bullet((self.rect.x, self.rect.y+12))
         if self.right:
             bullet.set_direction('right')
@@ -86,18 +108,59 @@ class Character(pygame.sprite.Sprite):
             return bullet
 
     def isAlive(self):
+        """Valida si el jugador esta vivo.
+
+        Returns
+        -------
+        True
+            Si la vida del jugador es mayor a 0.
+        False
+            Si la vida del jugador es menor o igual a 0.
+        """
         return self.health > 0
 
     def kill_character(self) -> bool:
-        if self.health == 0:
+        """Elimina al jugador.
+
+        Returns
+        -------
+        True
+            Si la vida del jugador es menor o igual a 0.
+        False
+            Si la vida del jugador es mayor a 0:
+            
+        """
+        if self.health <= 0:
             self.kill()
             return True
         return False
         
     def collide(self, other):
+        """Verifica si el jugador esta colisionando con algun otro objeto.
+        
+        Parameters
+        ----------
+        other: Sprite
+            Objeto con el cual se va a verificar.
+        
+        Returns
+        -------
+        True
+            Si el jugador colisiona con el objeto.
+        False
+            Si el jugador no colisiona con el objeto.
+        """
         return self.rect.colliderect(other)
 
     def calculate_score(self) -> int:
+        """Calcula el puntaje obtenido por el jugador en relacion a las balas dispardas 
+            y las balas acertadas. 
+        
+        Returns
+        -------
+        El puntaje obtenido.
+        
+        """
         if self.bullets_shoot == 0:
             return 0
         else:

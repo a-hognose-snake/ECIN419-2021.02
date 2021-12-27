@@ -2,6 +2,8 @@ import pygame
 from bullet.Bullet import Bullet
 
 class Enemy(pygame.sprite.Sprite):
+    """Enemigos del juego.
+    """
     def __init__(self, position: tuple) -> None:
         super().__init__()
         self.image = pygame.image.load("resources/images/enemy/7.png")
@@ -30,6 +32,8 @@ class Enemy(pygame.sprite.Sprite):
 
 
     def move(self):
+        """Actualiza los Sprite del enemigo en base a la velocidad.
+        """
         if self.velocity > 0:
             # if we are moving right
             if self.rect.x < self.path[1] + self.velocity:
@@ -64,6 +68,13 @@ class Enemy(pygame.sprite.Sprite):
                 
 
     def shoot(self):
+        """Realiza un disparo.
+
+        Returns
+        -------
+        bullet: Bullet
+            Bala del disparo.
+        """
         bullet = Bullet((self.rect.x+35, self.rect.y+19))
         if self.right == True and self.left == False:
             bullet.set_direction('right')

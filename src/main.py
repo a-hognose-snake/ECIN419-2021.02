@@ -5,12 +5,34 @@ from level.Level import Level
 
 pygame.init()
 
+FONT_SMALL = pygame.font.SysFont("comicsansms", 20)
+
+def start_text(screen, background):
+    """ Imprime el texto de inicio.
+
+    Parameters
+    ----------
+    screen: Surface
+        Pantalla del juego.
+    background: Surface
+        Fondo del juego.
+    
+    """
+    screen.blit(background, (0,0))
+    init_text = FONT_SMALL.render(
+            "Press 'I' to START", True, (255, 255, 255))
+    screen.blit(init_text, (600, 680))
+    exit_text = FONT_SMALL.render(
+            "Press 'E' to EXIT", True, (255, 255, 255))
+    screen.blit(exit_text, (270, 680))
+
 def main():
-    font_mid = pygame.font.SysFont("comicsansms", 50)
-    font_small = pygame.font.SysFont("comicsansms", 20)
-    font_v_small = pygame.font.SysFont("comicsansms", 14)
+    """Función principal.
+    """
+    background = pygame.image.load("resources/images/level/init.jpg")
     width = 1080
     height = 720
+    background = pygame.transform.scale(background, (width, height))
     screen = pygame.display.set_mode((width, height))
     clock = pygame.time.Clock()
     screen.fill((255, 255, 255))
@@ -34,28 +56,12 @@ def main():
                     else:
                         continue_game = level.runnin_level(screen, height, width)
 
-        screen.fill((0, 55, 79))
-        initmessage = font_mid.render("Fukushū", True, (254, 254, 254))
-        centerInitMessage = initmessage.get_rect(center=(width / 2, height / 2))
-        screen.blit(initmessage, centerInitMessage)
-        init_text = font_small.render(
-            "Press I to start", True, (255, 255, 255))
-        screen.blit(init_text, (460, 400))
-        """
-        instruction1 = font_v_small.render(
-            "Press P to pause", True, (0,0,0))
-        screen.blit(instruction1, (10, 470))
-        """
-        exit_text = font_v_small.render(
-            "Press E to exit", True, (255, 255, 255))
-        screen.blit(exit_text, (475, 440))
+        start_text(screen, background)
         pygame.display.update()
-        #level.collide_character_platform()
 
         clock.tick(75)
     pygame.quit()
 
 
 main()
-print("FIN")
 exit()

@@ -74,7 +74,6 @@ class Level:
                             self.bullets.add(character_shoot)
 
             platform_aux = pygame.sprite.spritecollideany(self.character, self.platform)
-            print(f'{self.character.state_y} -- {self.character.rect.y}')
             if platform_aux:
                 self.collide_platform(platform_aux)
             else:

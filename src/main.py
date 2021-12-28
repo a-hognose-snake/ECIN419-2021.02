@@ -28,10 +28,8 @@ def main():
     background = pygame.transform.scale(background, (WIDTH, HEIGHT))
     clock = pygame.time.Clock()
     SCREEN.fill((255, 255, 255))
-    character = Character((0,200))
+    character_point = 0
     exit_game = False
-    level = Level(character, 0)
-    continue_game = False
     while not exit_game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -41,18 +39,29 @@ def main():
                 if keys[pygame.K_e]:
                     exit_game = True
                 if keys[pygame.K_i]:
-                    if continue_game:
-                        character = Character((0,200))
-                        level = Level(character, 0)
-                        continue_game = level.runnin_level()
-                    else:
-                        continue_game = level.runnin_level()
-
+                    n_level = 0
+                    character = Character((0,200))
+                    while True:
+                        print('while')
+                        level = Level(character, n_level)
+                        print(f'el nivel es: {level.level + 1}')
+                        finish_level = level.runnin_level()
+                        if finish_level:
+                            if level.isGameWin():
+                                character = level.character
+                                character.health = 100
+                                character_point += character.calculate_score()
+                                n_level = level.level + 1
+                            if level.isGameOver():
+                                break      
+                        else:
+                            break  
         start_text(background)
         pygame.display.update()
-
         clock.tick(FPS)
     pygame.quit()
+
+    print(f'El puntaje total obtenido fue de:{character_point}')
 
 
 main()

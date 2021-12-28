@@ -8,8 +8,16 @@ from random import randint
 class Level:
     def __init__(self, character: Character, level: int) -> None:
         self.character = character
-        self.maps = ['resources/images/level/map_1.txt', 'resources/images/level/map_2.txt']
-        self.path_background = ['resources/images/level/background_1.jpg', 'resources/images/level/background_2.jpg', 'resources/images/level/background_3.jpg', 'resources/images/level/background_4.jpg']
+        self.maps = ['resources/images/level/map_1.txt', 
+                    'resources/images/level/map_2.txt',
+                    'resources/images/level/map_3.txt',
+                    'resources/images/level/map_4.txt',
+                    'resources/images/level/map_5.txt']
+        self.path_background = ['resources/images/level/l_1.jpg', 
+                                'resources/images/level/l_2.jpg', 
+                                'resources/images/level/l_3.jpg', 
+                                'resources/images/level/l_4.jpg', 
+                                'resources/images/level/l_5.jpg']
         self.level = level
         self.enemys = pygame.sprite.Group()
         self.platform = self.generate_platform_map()
@@ -18,8 +26,9 @@ class Level:
         self.bullets_enemy = pygame.sprite.Group()
         self.cont = 0
         self.cant_enemys = self.enemys.__len__()
-        self.game_over_c = False
-        self.game_win_c = False
+        self.game_over = False
+        self.game_win = False
+        self.finished = False
 
         #ESCRIBIR EN PANTALLA
         self.font = pygame.font.Font("resources/fonts/minimal/Minimal3x5.ttf", 25)
@@ -63,7 +72,7 @@ class Level:
         return self.platform_aux
 
     def create_enemy(self, coord_x_r, coord_x_l, y):
-        """ Crea enemigos en una posicion indicada.
+        """Crea enemigos en una posicion indicada.
         
         Parameters
         ----------
@@ -88,7 +97,7 @@ class Level:
             
         """
         clock = pygame.time.Clock()
-        while not self.game_over_c or not self.game_win_c:
+        while not self.finished:
             self.cont+=1
             if self.cont == 50:
                 for e in self.enemys:
@@ -96,7 +105,7 @@ class Level:
                 self.cont = 0
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    return True
+                    return self.finished
                 keys = pygame.key.get_pressed()
                 if event.type == pygame.KEYDOWN:
                     if keys[pygame.K_SPACE]:
@@ -127,16 +136,26 @@ class Level:
                     enemy_c.rect.bottom = platform.rect.top+1
 
             if self.character_win():
-                self.game_win()
-                self.game_win_c = True
-                return self.game_win_c
+                self.win_game()
+                self.game_over = False
+                self.game_win = True
+                self.finished = True
             if not self.character.isAlive():
-                self.game_over()
-                self.game_over_c = True
-                return self.game_over_c
+                self.lost_game()
+                self.game_win = False
+                self.game_over = True
+                self.finished = True
 
             clock.tick(FPS)
             pygame.display.update()
+
+        return self.finished
+
+    def isGameWin(self):
+        return self.game_win
+
+    def isGameOver(self):
+        return self.game_over
 
     def update_status_character(self):
         """Actualiza a todos los estados del jugador.
@@ -233,7 +252,7 @@ class Level:
             text = self.font.render("SCORE: " + str(self.character.calculate_score()), True,(0,0,0))
             SCREEN.blit(text, (975, 690))
 
-    def game_over(self):
+    def lost_game(self):
         """Se verifica si el jugador ha perdido la partida.
         """
         exit_lost = False
@@ -249,14 +268,22 @@ class Level:
                     exit_lost = True
             pygame.display.update()
 
-    def game_win(self):
+    def win_game(self):
         exit_game_win = False
         while not exit_game_win:
             text = self.font_game_over.render("Win!!  Score: " + str(self.character.calculate_score()), True, (0,0,0))
             SCREEN.blit(text, ((WIDTH/2)-210, (HEIGHT/2)-90))
+
+            text_continue = self.font.render("Press 'ENTER' to continue...", True, (0,0,0))
+            SCREEN.blit(text_continue, ((WIDTH/2)-190,(HEIGHT/2)- 20))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit_game_win = True
+                keys = pygame.key.get_pressed()
+                if event.type == pygame.KEYDOWN:
+                    if keys[pygame.K_RETURN]:
+                        exit_game_win = True
+
             pygame.display.update()
 
     def update_coordinates(self, platform_aux: Platform):

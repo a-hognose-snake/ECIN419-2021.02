@@ -10,14 +10,15 @@ class Bullet(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.topleft = position
         self.direction = ''
-
+        self.velocity = 10
+        
     def update(self) -> None:
         if self.direction == 'left':
-            self.rect.x -= 10
+            self.rect.x -= self.velocity
             if self.rect.x == 0:
                 self.kill()
         elif self.direction == 'right':
-            self.rect.x += 10
+            self.rect.x += self.velocity
             if self.rect.x ==1080:
                 self.kill()
 

@@ -1,4 +1,5 @@
 import pygame
+from enemy.Boss import Boss
 from platform.Platform import Platform
 from character.Character import Character
 from enemy.Enemy import Enemy
@@ -20,12 +21,17 @@ class Level:
                                 'resources/images/level/l_5.jpeg']
         self.level = level
         self.enemys = pygame.sprite.Group()
+        self.boss = None
         self.platform = self.generate_map_elements()
         self.background = pygame.transform.scale(pygame.image.load(self.path_background[level]), (1080, 720))
         self.bullets = pygame.sprite.Group()   
         self.bullets_enemy = pygame.sprite.Group()
+        self.bullets_boss = pygame.sprite.Group()
         self.cont = 0
-        self.cant_enemys = self.enemys.__len__()
+        if self.boss is not None:
+            self.cant_enemys = self.enemys.__len__() + 1
+        else: 
+            self.cant_enemys = self.enemys.__len__() 
         self.game_over = False
         self.game_win = False
         self.finished = False
@@ -75,6 +81,7 @@ class Level:
             x = 0
             y += 15
         return self.platform_aux
+
     def create_final_boss(self, coord_x_r, coord_x_l, y):
         """Crea al jefe final en la posicion indicada.
         
@@ -88,10 +95,10 @@ class Level:
             Posición y del jefe.
         """
 
-        boss = Enemy((((coord_x_r + coord_x_l) / 2), y), ENEMYS_IMAGES[len(ENEMYS_IMAGES)-1])
+        boss = Boss((((coord_x_r + coord_x_l) / 2), y), ENEMYS_IMAGES[len(ENEMYS_IMAGES)-1])
         boss.limit_left = coord_x_l
         boss.limit_right = coord_x_r
-        self.enemys.add(boss)
+        self.boss = boss
 
     def create_enemy(self, coord_x_r, coord_x_l, y):
         """Crea enemigos en una posicion indicada.
@@ -116,7 +123,6 @@ class Level:
         Returns
         -------
         Bool
-            
         """
         clock = pygame.time.Clock()
         while not self.finished:
@@ -124,6 +130,8 @@ class Level:
             if self.cont == 50:
                 for e in self.enemys:
                     self.bullets_enemy.add(e.shoot())
+                if self.boss is not None:
+                    self.bullets_boss.add(self.boss.shoot())
                 self.cont = 0
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -150,6 +158,8 @@ class Level:
             self.collide_bullet_with_enemy()
             self.collide_character_with_enemy()
             self.collide_bullet_with_character()
+            if self.boss is not None:
+                self.collide_bullet_with_boss()
             self.show_score()
             self.show_life()
 
@@ -210,6 +220,9 @@ class Level:
         """Actualiza a todos los elementos del juego.
         """
         self.character.update()
+        if self.boss is not None:
+            self.boss.update()
+            self.bullets_boss.update()
         self.bullets.update()
         self.enemys.update()
         self.bullets_enemy.update()
@@ -224,17 +237,48 @@ class Level:
         self.bullets.draw(SCREEN)
         self.bullets_enemy.draw(SCREEN)
         self.platform.draw(SCREEN)
-        
+        if self.boss is not None:
+            SCREEN.blit(self.boss.image, self.boss.rect)
+            self.bullets_boss.draw(SCREEN)
+
+
     def collide_bullet_with_character(self):
         """Actualiza la vida del jugador en caso de que colisione una bala lanzada por un enemigo.
         """
-        bullet = pygame.sprite.spritecollideany(self.character, self.bullets_enemy)
-        if bullet:
+        bullet_e = pygame.sprite.spritecollideany(self.character, self.bullets_enemy)
+        if bullet_e:
             pygame.mixer.music.load('resources/sounds/hit_bullet_character.mp3')
             pygame.mixer.music.set_volume(.1)
             pygame.mixer.music.play()
             self.character.health -= 10
-            bullet.kill()
+            bullet_e.kill()
+
+        if self.boss is not None:
+            bullet_b = pygame.sprite.spritecollideany(self.character, self.bullets_boss)
+            if bullet_b:
+                pygame.mixer.music.load('resources/sounds/hit_bullet_character.mp3')
+                pygame.mixer.music.set_volume(.1)
+                pygame.mixer.music.play()
+                self.character.health -= 20
+                bullet_b.kill()
+
+    def collide_bullet_with_boss(self):
+        if self.boss is not None:
+            bullet = pygame.sprite.spritecollideany(self.boss, self.bullets)
+            if bullet:
+                pygame.mixer.music.load('resources/sounds/hit.mp3')
+                pygame.mixer.music.set_volume(.1)
+                pygame.mixer.music.play()
+                self.boss.health -= 10
+                bullet.kill()
+                if self.boss.health == 0:
+                    pygame.mixer.music.load('resources/sounds/enemy_death.mp3')
+                    pygame.mixer.music.set_volume(.1)
+                    pygame.mixer.music.play()
+                    self.boss.kill()
+                    self.boss = None
+                    self.cant_enemys -= 1
+                self.character.bullets_hit += 1
 
     def collide_bullet_with_enemy(self):
         """Actualiza la vida del enemigo en caso de que colisione con una bala lanzada por un jugador.
@@ -267,6 +311,15 @@ class Level:
             if self.character.left:
                 self.character.rect.x += 20
                 enemy.rect.x -= 30
+        if self.boss is not None:
+            if self.character.collide(self.boss):
+                self.character.health -= 15
+                if self.character.right:
+                    self.character.rect.x -= 40
+                    self.boss.rect.x += 30
+                if self.character.left:
+                    self.character.rect.x += 40
+                    self.boss.rect.x -= 30
 
     def character_win(self) -> bool:
         """Verifica si el jugador gana o pierde.
@@ -296,7 +349,7 @@ class Level:
         SCREEN.blit(text, (975, 690))
 
     def lost_game(self):
-        """Se verifica si el jugador ha perdido la partida.
+        """Muestra un mensaje cuando el jugador pierde la partida.
         """
         exit_lost = False
         if self.cant_enemys > 0:
@@ -331,6 +384,8 @@ class Level:
             pygame.display.update()
 
     def win_game(self):
+        """Muestra un mensaje cuando el jugador gana la partida.
+        """
         exit_game_win = False
         while not exit_game_win:
             if self.level > 2:

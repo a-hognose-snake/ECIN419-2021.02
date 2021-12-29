@@ -2,8 +2,8 @@ import pygame
 from bullet.Bullet import Bullet
 from constant.constant import *
 
-class Enemy(pygame.sprite.Sprite):
-    """Enemigos del juego.
+class Boss(pygame.sprite.Sprite):
+    """Jefe del juego.
     """
     def __init__(self, position: tuple, images: tuple) -> None:
         super().__init__()
@@ -12,16 +12,16 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.position = position
         self.rect.topleft = position
-        self.health = 100
-        
+        self.health = 250
         self.limit_left = -1
         self.limit_right = -1
-        self.velocity = 3
+        self.velocity = 5
         self.left = False
         self.right = True
 
     def update(self):
         self.move()
+        self.difficulty()
 
     def move(self):
         """Actualiza los Sprite del enemigo en base a la velocidad.
@@ -51,7 +51,16 @@ class Enemy(pygame.sprite.Sprite):
             self.right = True
 
             self.rect.left = 0
-                
+    
+    def difficulty(self):
+        """Varia la velocidad del jefe final en base a su vida
+        """
+        if 150 < self.health <= 250:
+            self.velocity = 5
+        elif 50 < self.health <= 150:
+            self.velocity = 10
+        elif 0 < self.health <= 50:
+            self.velocity = 15
 
     def shoot(self):
         """Realiza un disparo.
@@ -61,7 +70,28 @@ class Enemy(pygame.sprite.Sprite):
         bullet: Bullet
             Bala del disparo.
         """
-        bullet = Bullet((self.rect.x+35, self.rect.y+19), 'resources/images/bullet/Bullet_e.png')
+        if 150 < self.health <= 250:
+            return self.create_bullet()
+        elif 50 < self.health <= 150:
+            return self.create_bullet(15)
+        elif 0 < self.health <= 50:
+            return self.create_bullet(20)
+
+    def create_bullet(self, velocity : int = 10):
+        """Crea una bala.
+
+        Parameters
+        ----------
+        velocity: int
+            Velocidad de la bala, por defecto es 10
+        
+        Returns
+        -------
+        bullet: Bullet
+            Bala del disparo
+        """
+        bullet = Bullet((self.rect.x+35, self.rect.y+19), 'resources/images/bullet/Bullet_b.png')
+        bullet.velocity = velocity
         if self.right == True and self.left == False:
             bullet.set_direction('right')
         else:

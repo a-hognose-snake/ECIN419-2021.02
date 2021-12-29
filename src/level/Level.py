@@ -15,12 +15,12 @@ class Level:
                     'resources/images/level/map_5.txt']
         self.path_background = ['resources/images/level/l_1.jpg', 
                                 'resources/images/level/l_2.jpg', 
-                                'resources/images/level/l_3.jpg', 
-                                'resources/images/level/l_4.jpg', 
-                                'resources/images/level/l_5.jpg']
+                                'resources/images/level/l_3.jpeg', 
+                                'resources/images/level/l_4.jpeg', 
+                                'resources/images/level/l_5.jpeg']
         self.level = level
         self.enemys = pygame.sprite.Group()
-        self.platform = self.generate_platform_map()
+        self.platform = self.generate_map_elements()
         self.background = pygame.transform.scale(pygame.image.load(self.path_background[level]), (1080, 720))
         self.bullets = pygame.sprite.Group()   
         self.bullets_enemy = pygame.sprite.Group()
@@ -35,8 +35,8 @@ class Level:
         self.font_game_over = pygame.font.Font("resources/fonts/minimal/Minimal3x5.ttf", 55)
         self.white_blue = (20, 171, 245)
 
-    def generate_platform_map(self) -> pygame.sprite.Group:
-        """Genera las plataformas que se mostrarán en el nivel.
+    def generate_map_elements(self) -> pygame.sprite.Group:
+        """Genera los elementos que se mostrarán en el nivel, plataformas y enemigos.
 
         Returns
         -------
@@ -53,6 +53,11 @@ class Level:
             for column in row:
                 if column == '1':
                     self.create_enemy(coord_x_r, coord_x_l, y)
+                if column == '2':
+                    self.character.rect.x = x
+                    self.character.rect.y = y
+                if column == '3':
+                    self.create_final_boss(coord_x_r, coord_x_l, y)
                 if column == 'l':
                     coord_x_l = x
                 if column == 'r':
@@ -70,6 +75,23 @@ class Level:
             x = 0
             y += 15
         return self.platform_aux
+    def create_final_boss(self, coord_x_r, coord_x_l, y):
+        """Crea al jefe final en la posicion indicada.
+        
+        Parameters
+        ----------
+        coord_x_r: int
+            Limite derecho en el cual se puede mover el jefe.
+        coord_x_l: int
+            Limite izquierdo en el cual se puede mover el jefe.
+        y: int
+            Posición y del jefe.
+        """
+
+        boss = Enemy((((coord_x_r + coord_x_l) / 2), y), ENEMYS_IMAGES[len(ENEMYS_IMAGES)-1])
+        boss.limit_left = coord_x_l
+        boss.limit_right = coord_x_r
+        self.enemys.add(boss)
 
     def create_enemy(self, coord_x_r, coord_x_l, y):
         """Crea enemigos en una posicion indicada.
@@ -77,13 +99,13 @@ class Level:
         Parameters
         ----------
         coord_x_r: int
-            Limite derecho en el cual se puede mover el enemigo
+            Limite derecho en el cual se puede mover el enemigo.
         coord_x_l: int
             Limite izquierdo en el cual se puede mover el enemigo.
         y: int
             Posición y del enemigo.
         """
-        enemy = Enemy((((coord_x_r + coord_x_l)/2), y), ENEMYS_IMAGES[randint(0, len(ENEMYS_IMAGES)-1)])
+        enemy = Enemy((((coord_x_r + coord_x_l)/2), y), ENEMYS_IMAGES[randint(0, len(ENEMYS_IMAGES)-2)])
         enemy.limit_left = coord_x_l
         enemy.limit_right = coord_x_r
         self.enemys.add(enemy)
@@ -118,8 +140,9 @@ class Level:
             if platform_aux:
                 self.update_coordinates(platform_aux)
             else:
-                self.character.state_y = 'falling'
-                
+                if not self.character.rect.bottom >= HEIGHT:
+                    self.character.state_y = 'falling'
+
             self.update_status_character()
             self.update_position_character()
             self.level_update()
@@ -128,6 +151,7 @@ class Level:
             self.collide_character_with_enemy()
             self.collide_bullet_with_character()
             self.show_score()
+            self.show_life()
 
             enemy = pygame.sprite.groupcollide(self.platform, self.enemys, False, False)
             if enemy:
@@ -176,11 +200,11 @@ class Level:
         """
         if self.character.rect.left < 0:
             self.character.rect.left = 0
-        elif self.character.rect.right > WIDTH:
+        elif self.character.rect.right >= WIDTH:
             self.character.rect.right = WIDTH
         if self.character.rect.top < 0:
             self.character.rect.top = 0
-        elif self.character.rect.bottom > HEIGHT:
+        elif self.character.rect.bottom >= HEIGHT:
             self.character.rect.bottom = HEIGHT
             self.character.state_y = 'standing'
 
@@ -208,6 +232,9 @@ class Level:
         """
         bullet = pygame.sprite.spritecollideany(self.character, self.bullets_enemy)
         if bullet:
+            pygame.mixer.music.load('resources/sounds/hit_bullet_character.mp3')
+            pygame.mixer.music.set_volume(.1)
+            pygame.mixer.music.play()
             self.character.health -= 10
             bullet.kill()
 
@@ -217,9 +244,15 @@ class Level:
         enemy = pygame.sprite.groupcollide(self.bullets, self.enemys, True, False)
         if enemy:
             for key, values in enemy.items():
+                pygame.mixer.music.load('resources/sounds/hit.mp3')
+                pygame.mixer.music.set_volume(.1)
+                pygame.mixer.music.play()
                 enemy_c = enemy[key][0]
                 enemy_c.health -= 10
                 if enemy_c.health == 0:
+                    pygame.mixer.music.load('resources/sounds/enemy_death.mp3')
+                    pygame.mixer.music.set_volume(.1)
+                    pygame.mixer.music.play()
                     enemy_c.kill()
                     self.cant_enemys -= 1
             self.character.bullets_hit += 1
@@ -227,12 +260,15 @@ class Level:
     def collide_character_with_enemy(self):
         """Actualiza la vida del jugador en caso de que colisione con un enemigo.
         """
-        if pygame.sprite.spritecollideany(self.character, self.enemys):
+        enemy = pygame.sprite.spritecollideany(self.character, self.enemys)
+        if enemy:
             self.character.health -= 10
             if self.character.right:
                 self.character.rect.x -= 20
+                enemy.rect.x += 30
             if self.character.left:
                 self.character.rect.x += 20
+                enemy.rect.x -= 30
 
     def character_win(self) -> bool:
         """Verifica si el jugador gana o pierde.
@@ -248,9 +284,18 @@ class Level:
     def show_score(self):
         """Muestra el puntaje obtenido por el jugador.
         """
-        if SCREEN is not None:
+        if self.level > 2:
+            text = self.font.render("SCORE: " + str(self.character.calculate_score()), True,(255,255,255))
+            SCREEN.blit(text, ((WIDTH/2)-10, 10))
+        else:
             text = self.font.render("SCORE: " + str(self.character.calculate_score()), True,(0,0,0))
-            SCREEN.blit(text, (975, 690))
+            SCREEN.blit(text, ((WIDTH/2)-10, 10))
+
+    def show_life(self):
+        """Muestra la vida del jugador.
+        """   
+        text = self.font.render("LIFE: " + str(self.character.health), True,(254,0,0))
+        SCREEN.blit(text, (975, 690))
 
     def lost_game(self):
         """Se verifica si el jugador ha perdido la partida.
@@ -259,23 +304,49 @@ class Level:
         if self.cant_enemys > 0:
             for e in self.enemys:
                 e.kill()
+        pygame.mixer.music.load('resources/sounds/gameOver.mp3')
+        pygame.mixer.music.set_volume(.2)
+        pygame.mixer.music.play()
         while not exit_lost:
-            text = self.font_game_over.render("You Lose!!  Score: " + str(self.character.calculate_score()), True, (0,0,0))
-            SCREEN.blit(text, ((WIDTH/2)-210, (HEIGHT/2)-90))
+            if self.level > 2:
+                text = self.font_game_over.render("You Lose!!  Score: " + str(self.character.calculate_score()), True, (255,255,255))
+                SCREEN.blit(text, ((WIDTH/2)-210, (HEIGHT/2)-90))
+
+                text_continue = self.font.render("Press 'ENTER' to continue...", True, (255,255,255))
+                SCREEN.blit(text_continue, ((WIDTH/2)-190,(HEIGHT/2)- 20))
+            else:
+                text = self.font_game_over.render("You Lose!!  Score: " + str(self.character.calculate_score()), True, (0,0,0))
+                SCREEN.blit(text, ((WIDTH/2)-210, (HEIGHT/2)-90))
+
+                text_continue = self.font.render("Press 'ENTER' to continue...", True, (0,0,0))
+                SCREEN.blit(text_continue, ((WIDTH/2)-190,(HEIGHT/2)- 20))
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    pygame.mixer.music.stop()
                     exit_lost = True
+                keys = pygame.key.get_pressed()
+                if event.type == pygame.KEYDOWN:
+                    if keys[pygame.K_RETURN]:
+                        exit_lost = True
+
             pygame.display.update()
 
     def win_game(self):
         exit_game_win = False
         while not exit_game_win:
-            text = self.font_game_over.render("Win!!  Score: " + str(self.character.calculate_score()), True, (0,0,0))
-            SCREEN.blit(text, ((WIDTH/2)-210, (HEIGHT/2)-90))
+            if self.level > 2:
+                text = self.font_game_over.render("Win!!  Score: " + str(self.character.calculate_score()), True, (255,255,255))
+                SCREEN.blit(text, ((WIDTH/2)-210, (HEIGHT/2)-90))
 
-            text_continue = self.font.render("Press 'ENTER' to continue...", True, (0,0,0))
-            SCREEN.blit(text_continue, ((WIDTH/2)-190,(HEIGHT/2)- 20))
+                text_continue = self.font.render("Press 'ENTER' to continue...", True, (255,255,255))
+                SCREEN.blit(text_continue, ((WIDTH/2)-190,(HEIGHT/2)- 20))
+            else:
+                text = self.font_game_over.render("Win!!  Score: " + str(self.character.calculate_score()), True, (0,0,0))
+                SCREEN.blit(text, ((WIDTH/2)-210, (HEIGHT/2)-90))
+
+                text_continue = self.font.render("Press 'ENTER' to continue...", True, (0,0,0))
+                SCREEN.blit(text_continue, ((WIDTH/2)-190,(HEIGHT/2)- 20))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit_game_win = True

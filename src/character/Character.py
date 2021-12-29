@@ -34,8 +34,11 @@ class Character(pygame.sprite.Sprite):
         """Calcula y realiza el salto del jugador.
         
         """
+        jump_sound = pygame.mixer.Sound('resources/sounds/jump.wav')
+        jump_sound.set_volume(.2)
+        jump_sound.play()
         self.velocity_y = (self.jump_timer / 3.0) * -9
-        self.jump_timer -= 0.5
+        self.jump_timer -= .5
         self.rect.y += self.velocity_y
 
     def update(self) -> None:
@@ -99,7 +102,10 @@ class Character(pygame.sprite.Sprite):
         bullet: Bullet
             Bala del disparo.
         """
-        bullet = Bullet((self.rect.x, self.rect.y+12))
+        bullet = Bullet((self.rect.x, self.rect.y+12), 'resources/images/bullet/Bullet.png')
+        bullet_sound = pygame.mixer.Sound('resources/sounds/Pop.wav')
+        bullet_sound.set_volume(.2)
+        bullet_sound.play()
         if self.right:
             bullet.set_direction('right')
             return bullet

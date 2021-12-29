@@ -22,7 +22,7 @@
   
 
                                         l           r 1
-                                        LMMMMMMMMMMMR
+  2                                     LMMMMMMMMMMMR
 LMMMMMMMMMMMMMMMMMMR                                                               
 
 
@@ -45,4 +45,3 @@ LMMMMMMMMMMMMMMMMMMMR                 LMMMMMMMMMMMR
 
 
 
-MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMR

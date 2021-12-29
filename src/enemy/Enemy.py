@@ -23,7 +23,6 @@ class Enemy(pygame.sprite.Sprite):
     def update(self):
         self.move()
 
-
     def move(self):
         """Actualiza los Sprite del enemigo en base a la velocidad.
         """
@@ -62,7 +61,7 @@ class Enemy(pygame.sprite.Sprite):
         bullet: Bullet
             Bala del disparo.
         """
-        bullet = Bullet((self.rect.x+35, self.rect.y+19))
+        bullet = Bullet((self.rect.x+35, self.rect.y+19), 'resources/images/bullet/Bullet_b.png')
         if self.right == True and self.left == False:
             bullet.set_direction('right')
         else:

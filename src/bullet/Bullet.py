@@ -4,12 +4,9 @@ import pygame
 class Bullet(pygame.sprite.Sprite):
     """Bala disparada por el jugador/enemigo.
     """
-    def __init__(self, position: tuple) -> None:
+    def __init__(self, position: tuple, image: str) -> None:
         super().__init__()
-        self.image = pygame.image.load(
-            "resources/images/bullet/Bullet.png")
-        self.image.set_clip(pygame.Rect(0, 0, 10, 10))
-        self.image = self.image.subsurface(self.image.get_clip())
+        self.image = pygame.image.load(image)
         self.rect = self.image.get_rect()
         self.rect.topleft = position
         self.direction = ''

@@ -24,6 +24,9 @@ def start_text(background):
 def main():
     """Función principal.
     """
+    pygame.mixer.music.load('resources/sounds/init.mp3')
+    pygame.mixer.music.set_volume(.5)
+    pygame.mixer.music.play()
     background = pygame.image.load("resources/images/level/init.jpg")
     background = pygame.transform.scale(background, (WIDTH, HEIGHT))
     clock = pygame.time.Clock()
@@ -39,6 +42,7 @@ def main():
                 if keys[pygame.K_e]:
                     exit_game = True
                 if keys[pygame.K_i]:
+                    pygame.mixer.music.stop()
                     n_level = 0
                     character = Character((0,200))
                     while True:

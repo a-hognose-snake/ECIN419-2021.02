@@ -110,7 +110,7 @@ class Level:
         enemy.limit_right = coord_x_r
         self.enemys.add(enemy)
 
-    def runnin_level(self) -> bool:
+    def runnin_level(self):
         """Ejecuta el nivel que esté jugando el jugador.
 
         Returns
@@ -173,12 +173,10 @@ class Level:
             clock.tick(FPS)
             pygame.display.update()
 
-        return self.finished
-
-    def isGameWin(self):
+    def isGameWin(self) -> bool:
         return self.game_win
 
-    def isGameOver(self):
+    def isGameOver(self) -> bool:
         return self.game_over
 
     def update_status_character(self):
@@ -248,7 +246,7 @@ class Level:
                 pygame.mixer.music.set_volume(.1)
                 pygame.mixer.music.play()
                 enemy_c = enemy[key][0]
-                enemy_c.health -= 10
+                enemy_c.health -= 50
                 if enemy_c.health == 0:
                     pygame.mixer.music.load('resources/sounds/enemy_death.mp3')
                     pygame.mixer.music.set_volume(.1)

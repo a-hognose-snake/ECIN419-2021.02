@@ -3,6 +3,7 @@ from bullet.Bullet import Bullet
 from character.Character import Character
 from level.Level import Level
 from constant.constant import *
+from sql.Connection import Connection
 
 def start_text(background):
     """ Imprime el texto de inicio.
@@ -24,6 +25,7 @@ def start_text(background):
 def main():
     """Función principal.
     """
+    con = Connection()
     pygame.mixer.music.load('resources/sounds/init.mp3')
     pygame.mixer.music.set_volume(.5)
     pygame.mixer.music.play()
@@ -46,20 +48,20 @@ def main():
                     n_level = 0
                     character = Character((0,200))
                     while True:
-                        print('while')
                         level = Level(character, n_level)
                         print(f'el nivel es: {level.level + 1}')
-                        finish_level = level.runnin_level()
-                        if finish_level:
-                            if level.isGameWin():
-                                character = level.character
-                                character.health = 100
-                                character_point += character.calculate_score()
-                                n_level = level.level + 1
-                            if level.isGameOver():
-                                break      
-                        else:
-                            break  
+                        level.runnin_level()
+                        character = level.character
+                        character.health = 100
+                        character_point = character.calculate_score()
+                        print(f'En el nivel {n_level+1 } se obtuvieron {character_point} puntos')
+                        if n_level == 4:
+                            print('Juego finalizado')
+                            break
+                        if level.isGameWin():
+                            n_level = level.level + 1
+                        if level.isGameOver():
+                            break       
         start_text(background)
         pygame.display.update()
         clock.tick(FPS)

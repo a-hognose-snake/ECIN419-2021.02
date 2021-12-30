@@ -156,7 +156,7 @@ class Level:
             if not self.character.rect.bottom >= HEIGHT:
                 self.character.state_y = 'falling'
 
-    def check_game_over(self):
+    def check_game_over(self) -> bool:
         """Verifica si el juego termina. El juego puede terminar por dos razones:
             1 Si el jugador gana.
             2 Si el jugador pierde.
@@ -166,11 +166,14 @@ class Level:
             self.game_over = False
             self.game_win = True
             self.finished = True
+            return True
         if not self.character.isAlive():
             self.lost_game()
             self.game_win = False
             self.game_over = True
             self.finished = True
+            return True
+        return False
 
     def runnin_level(self):
         """Ejecuta el nivel que esté jugando el jugador.
@@ -183,7 +186,7 @@ class Level:
         while not self.finished:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    return pygame.quit()
+                    return self.finished
                 keys = pygame.key.get_pressed()
                 if event.type == pygame.KEYDOWN:
                     if keys[pygame.K_SPACE]:
@@ -207,7 +210,8 @@ class Level:
 
             self.show_life()
             self.check_collide_enemy_platform()
-            self.check_game_over()
+            if self.check_game_over():
+                return self.finished
 
             clock.tick(FPS)
             pygame.display.update()

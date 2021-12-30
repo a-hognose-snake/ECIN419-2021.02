@@ -139,6 +139,34 @@ def start_text(background):
             "Press 'E' to EXIT", True, (255, 255, 255))
     SCREEN.blit(exit_text, (270, 680))
 
+def run_level(con: Connection, nickname: str,):
+    """Ejecuta los niveles del juego.
+    
+    Parameters
+    ----------
+    con: Connection
+        Clase que contiene metodos para interactuar con sqlite.
+    nickname: str
+        Nickname del jugador.
+    """
+    n_level = 0
+    character = Character((0,200))
+    while True:
+        level = Level(character, n_level)
+        if not level.runnin_level():
+            break
+        character = level.character
+        character.health = 100
+        score_level = character.calculate_score()
+        character.bullets_shoot = 0 #contador de balas lanzadas
+        character.bullets_hit = 0 #contador de balas acertadas
+        con.modify_score(nickname, n_level + 1, score_level)
+        if n_level == 4: 
+            break
+        if level.isGameWin():
+            n_level = level.level + 1
+        if level.isGameOver():
+            break   
 def main():
     """Función principal.
     """
@@ -151,7 +179,6 @@ def main():
     background = pygame.transform.scale(background, (WIDTH, HEIGHT))
     clock = pygame.time.Clock()
     SCREEN.fill((255, 255, 255))
-    score_level = 0
     exit_game = False
     nickname = text_box(background)
     if nickname is not None:
@@ -170,23 +197,7 @@ def main():
                     show_puntaje(con)
                 if keys[pygame.K_i]:
                     pygame.mixer.music.stop()
-                    n_level = 0
-                    character = Character((0,200))
-                    while True:
-                        level = Level(character, n_level)
-                        level.runnin_level()
-                        character = level.character
-                        character.health = 100
-                        score_level = character.calculate_score()
-                        character.bullets_shoot = 0 #contador de balas lanzadas
-                        character.bullets_hit = 0 #contador de balas acertadas
-                        con.modify_score(nickname, n_level + 1, score_level)
-                        if n_level == 4: 
-                            break
-                        if level.isGameWin():
-                            n_level = level.level + 1
-                        if level.isGameOver():
-                            break     
+                    run_level(con, nickname)
                             
 
         start_text(background)

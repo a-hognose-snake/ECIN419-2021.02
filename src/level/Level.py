@@ -117,6 +117,61 @@ class Level:
         enemy.limit_right = coord_x_r
         self.enemys.add(enemy)
 
+
+    def shoot_character(self):
+        """Realiza los disparos del jugador.
+        """
+        character_shoot = self.character.shoot()
+        if character_shoot:
+            self.character.bullets_shoot += 1
+            self.bullets.add(character_shoot)
+
+    def shoot_enemy(self):
+        """Realiza los disparos de los enemigos.
+        """
+        self.cont+=1
+        if self.cont == 50:
+            for e in self.enemys:
+                self.bullets_enemy.add(e.shoot())
+            if self.boss is not None:
+                self.bullets_boss.add(self.boss.shoot())
+            self.cont = 0
+
+    def check_collide_enemy_platform(self):
+        """Verifica si algun enemigo esta encima de una plataforma.
+        """
+        enemy = pygame.sprite.groupcollide(self.platform, self.enemys, False, False)
+        if enemy:
+            for platform, values in enemy.items():
+                enemy_c = enemy[platform][0]
+                enemy_c.rect.bottom = platform.rect.top+1
+
+    def check_collide_character_platform(self):
+        """Verifica si el jugador esta en una plataforma.
+        """            
+        platform_aux = pygame.sprite.spritecollideany(self.character, self.platform)
+        if platform_aux:
+            self.update_coordinates(platform_aux)
+        else:
+            if not self.character.rect.bottom >= HEIGHT:
+                self.character.state_y = 'falling'
+
+    def check_game_over(self):
+        """Verifica si el juego termina. El juego puede terminar por dos razones:
+            1 Si el jugador gana.
+            2 Si el jugador pierde.
+        """
+        if self.character_win():
+            self.win_game()
+            self.game_over = False
+            self.game_win = True
+            self.finished = True
+        if not self.character.isAlive():
+            self.lost_game()
+            self.game_win = False
+            self.game_over = True
+            self.finished = True
+
     def runnin_level(self):
         """Ejecuta el nivel que esté jugando el jugador.
 
@@ -126,31 +181,16 @@ class Level:
         """
         clock = pygame.time.Clock()
         while not self.finished:
-            self.cont+=1
-            if self.cont == 50:
-                for e in self.enemys:
-                    self.bullets_enemy.add(e.shoot())
-                if self.boss is not None:
-                    self.bullets_boss.add(self.boss.shoot())
-                self.cont = 0
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return self.finished
                 keys = pygame.key.get_pressed()
                 if event.type == pygame.KEYDOWN:
                     if keys[pygame.K_SPACE]:
-                        character_shoot = self.character.shoot()
-                        if character_shoot:
-                            self.character.bullets_shoot += 1
-                            self.bullets.add(character_shoot)
+                        self.shoot_character()
 
-            platform_aux = pygame.sprite.spritecollideany(self.character, self.platform)
-            if platform_aux:
-                self.update_coordinates(platform_aux)
-            else:
-                if not self.character.rect.bottom >= HEIGHT:
-                    self.character.state_y = 'falling'
-
+            self.check_collide_character_platform()
+            self.shoot_enemy()
             self.update_status_character()
             self.update_position_character()
             self.level_update()
@@ -160,25 +200,14 @@ class Level:
             self.collide_bullet_with_character()
             if self.boss is not None:
                 self.collide_bullet_with_boss()
-            self.show_score()
+            if self.level > 2:
+                self.show_score((255, 255, 255))
+            else:
+                self.show_score((0, 0, 0))
+
             self.show_life()
-
-            enemy = pygame.sprite.groupcollide(self.platform, self.enemys, False, False)
-            if enemy:
-                for platform, values in enemy.items():
-                    enemy_c = enemy[platform][0]
-                    enemy_c.rect.bottom = platform.rect.top+1
-
-            if self.character_win():
-                self.win_game()
-                self.game_over = False
-                self.game_win = True
-                self.finished = True
-            if not self.character.isAlive():
-                self.lost_game()
-                self.game_win = False
-                self.game_over = True
-                self.finished = True
+            self.check_collide_enemy_platform()
+            self.check_game_over()
 
             clock.tick(FPS)
             pygame.display.update()
@@ -332,15 +361,16 @@ class Level:
         """
         return self.character.isAlive() and self.cant_enemys == 0
 
-    def show_score(self):
+    def show_score(self, color: tuple):
         """Muestra el puntaje obtenido por el jugador.
+
+        Parameters
+        ----------
+        color: tuple
+            Color con el cual se mostrara la información.
         """
-        if self.level > 2:
-            text = self.font.render("SCORE: " + str(self.character.calculate_score()), True,(255,255,255))
-            SCREEN.blit(text, ((WIDTH/2)-10, 10))
-        else:
-            text = self.font.render("SCORE: " + str(self.character.calculate_score()), True,(0,0,0))
-            SCREEN.blit(text, ((WIDTH/2)-10, 10))
+        text = self.font.render("SCORE: " + str(self.character.calculate_score()), True, color)
+        SCREEN.blit(text, ((WIDTH/2)-30, 10))
 
     def show_life(self):
         """Muestra la vida del jugador.
@@ -351,6 +381,21 @@ class Level:
     def lost_game(self):
         """Muestra un mensaje cuando el jugador pierde la partida.
         """
+
+        def score_text(color: tuple):
+            """Muestra el score obtenido al momento de perder la partida.
+            
+            Parameters
+            ----------
+            color: tuple
+                Color con el cual se mostrara la información.
+            """
+            text = self.font_game_over.render("You Lose!!  Score: " + str(self.character.calculate_score()), True, color)
+            SCREEN.blit(text, ((WIDTH/2)-210, (HEIGHT/2)-90))
+
+            text_continue = self.font.render("Press 'ENTER' to continue...", True, color)
+            SCREEN.blit(text_continue, ((WIDTH/2)-160,(HEIGHT/2)- 20))
+
         exit_lost = False
         if self.cant_enemys > 0:
             for e in self.enemys:
@@ -360,17 +405,9 @@ class Level:
         pygame.mixer.music.play()
         while not exit_lost:
             if self.level > 2:
-                text = self.font_game_over.render("You Lose!!  Score: " + str(self.character.calculate_score()), True, (255,255,255))
-                SCREEN.blit(text, ((WIDTH/2)-210, (HEIGHT/2)-90))
-
-                text_continue = self.font.render("Press 'ENTER' to continue...", True, (255,255,255))
-                SCREEN.blit(text_continue, ((WIDTH/2)-190,(HEIGHT/2)- 20))
+                score_text((255,255, 255))
             else:
-                text = self.font_game_over.render("You Lose!!  Score: " + str(self.character.calculate_score()), True, (0,0,0))
-                SCREEN.blit(text, ((WIDTH/2)-210, (HEIGHT/2)-90))
-
-                text_continue = self.font.render("Press 'ENTER' to continue...", True, (0,0,0))
-                SCREEN.blit(text_continue, ((WIDTH/2)-190,(HEIGHT/2)- 20))
+                score_text((0,0,0))
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -386,20 +423,28 @@ class Level:
     def win_game(self):
         """Muestra un mensaje cuando el jugador gana la partida.
         """
+
+        def score_text(color: tuple):
+            """Muestar el score obtenido al momento de ganar la partida.
+            
+            Parameters
+            ----------
+            color: tuple
+                Color con el cual se mostrara la información.
+            """
+            text = self.font_game_over.render("Win!!  Score: " + str(self.character.calculate_score()), True, color)
+            SCREEN.blit(text, ((WIDTH/2)-210, (HEIGHT/2)-90))
+
+            text_continue = self.font.render("Press 'ENTER' to continue...", True, color)
+            SCREEN.blit(text_continue, ((WIDTH/2)-160,(HEIGHT/2)- 20))
+
         exit_game_win = False
         while not exit_game_win:
             if self.level > 2:
-                text = self.font_game_over.render("Win!!  Score: " + str(self.character.calculate_score()), True, (255,255,255))
-                SCREEN.blit(text, ((WIDTH/2)-210, (HEIGHT/2)-90))
-
-                text_continue = self.font.render("Press 'ENTER' to continue...", True, (255,255,255))
-                SCREEN.blit(text_continue, ((WIDTH/2)-190,(HEIGHT/2)- 20))
+                score_text((255, 255, 255))
             else:
-                text = self.font_game_over.render("Win!!  Score: " + str(self.character.calculate_score()), True, (0,0,0))
-                SCREEN.blit(text, ((WIDTH/2)-210, (HEIGHT/2)-90))
+                score_text((0, 0, 0))
 
-                text_continue = self.font.render("Press 'ENTER' to continue...", True, (0,0,0))
-                SCREEN.blit(text_continue, ((WIDTH/2)-190,(HEIGHT/2)- 20))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit_game_win = True

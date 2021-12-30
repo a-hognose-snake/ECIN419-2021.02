@@ -149,6 +149,20 @@ class Connection:
             return False
 
     def get_score_level(self, level: int):
+        """Obtiene los 5 primeros nickname y el puntaje correspondiente a los jugadores de un nivel
+        
+        Parameters
+        ----------
+        level: int
+            Nivel del cual se obtendran los datos.
+        
+        Returns
+        -------
+        rows: list
+            Lista con los datos.
+        None
+            Si no encuentra datos.
+        """
         try:
             self.cur.execute('SELECT L.id_level, P.nickname, S.score_level FROM LEVEL L \
                 INNER JOIN SCORE S ON S.id_level = L.id_level \

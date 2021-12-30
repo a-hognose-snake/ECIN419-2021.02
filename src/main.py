@@ -5,6 +5,17 @@ from constant.constant import *
 from sql.Connection import Connection
 
 def get_score_level(level: int, con: Connection, pos_level: tuple):
+    """Muestra los puntajes correspondientes a un nivel.
+
+    Paramters
+    ---------
+    level: int
+        Nivel desde donde se obtendran los datos.
+    con: Connection
+        Clase que contiene metodos para interactuar con sqlite.
+    pos_level: tuple
+        Posicion en donde se va a mostrar el puntaje.
+    """
     text = ''
     rows = con.get_score_level(level)
     text = 'Level: ' +  str(level)
@@ -22,6 +33,13 @@ def get_score_level(level: int, con: Connection, pos_level: tuple):
             coord_y += 30
 
 def show_puntaje(con: Connection):
+    """Crea una pantalla con los 5 mayores puntajes de los niveles.
+
+    Parameters
+    ----------
+    con: Connection
+        Clase que contiene metodos para interactuar con sqlite.
+    """
     finished = False
     clock = pygame.time.Clock()
     while not finished:
@@ -36,10 +54,12 @@ def show_puntaje(con: Connection):
         SCREEN.fill((0, 0, 0))
         get_score_level(1, con, (50, 50))
         get_score_level(2, con, (550, 50))
-
         get_score_level(3, con, (50, 250))
         get_score_level(4, con, (550, 250))
         get_score_level(5, con, (50, 450))
+        return_text = FONT_SMALL.render(
+                "Press 'R' to return", True, (255, 255, 255))
+        SCREEN.blit(return_text, (600, 680))
         pygame.display.update()
         clock.tick(FPS)
 
@@ -106,6 +126,9 @@ def start_text(background):
     
     """
     SCREEN.blit(background, (0,0))
+    score_text = FONT_SMALL.render(
+            "Press 'P' to SCORE", True, (255, 255, 255))
+    SCREEN.blit(score_text, (WIDTH/2-100, 20))
     init_text = FONT_SMALL.render(
             "Press 'I' to START", True, (255, 255, 255))
     SCREEN.blit(init_text, (600, 680))
@@ -144,7 +167,7 @@ def main():
                     show_puntaje(con)
                 if keys[pygame.K_i]:
                     pygame.mixer.music.stop()
-                    n_level = 4
+                    n_level = 0
                     character = Character((0,200))
                     while True:
                         level = Level(character, n_level)

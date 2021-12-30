@@ -51,9 +51,6 @@ class Character(pygame.sprite.Sprite):
                 self.state_y = 'falling'
         if self.jump_timer <= 0:
             self.state_y = 'falling'
-        
-        if pressed[pygame.K_s] and self.rect.y < 720 - 64 - self.velocity:
-            self.rect.y += self.velocity
 
         if pressed[pygame.K_a] and self.rect.x > -21:
             self.left = True

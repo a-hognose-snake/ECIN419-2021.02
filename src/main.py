@@ -1,3 +1,5 @@
+#style guide utilizado -> https://numpydoc.readthedocs.io/en/latest/format.html
+
 import pygame
 from character.Character import Character
 from level.Level import Level

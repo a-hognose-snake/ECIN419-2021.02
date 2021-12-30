@@ -88,7 +88,8 @@ def text_box(background) -> str:
     while not exit_game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                    exit_game = True
+                active = False
+                exit_game = True
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if input_rect.collidepoint(event.pos):
                     active = True
@@ -160,7 +161,7 @@ def main():
     while not exit_game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                    exit_game = True
+                exit_game = True
             keys = pygame.key.get_pressed()
             if event.type == pygame.KEYDOWN:
                 if keys[pygame.K_e]:

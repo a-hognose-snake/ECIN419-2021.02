@@ -1,6 +1,6 @@
 import pygame
 from enemy.Boss import Boss
-from platform.Platform import Platform
+from plat.Platform import Platform
 from character.Character import Character
 from enemy.Enemy import Enemy
 from constant.constant import *
@@ -183,7 +183,7 @@ class Level:
         while not self.finished:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    return self.finished
+                    return pygame.quit()
                 keys = pygame.key.get_pressed()
                 if event.type == pygame.KEYDOWN:
                     if keys[pygame.K_SPACE]:

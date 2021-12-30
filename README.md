@@ -16,6 +16,8 @@ Construcción de un videojuego con un mínimo de 5 niveles. Debe incluir input, 
 ### Organización
 ------------
     ├── img
+    │   ├── Diagrama_de_clases.png
+    │   └── MR.png
     ├── resources
     │   ├── fonts
     │   ├── images
@@ -27,19 +29,27 @@ Construcción de un videojuego con un mínimo de 5 niveles. Debe incluir input, 
     │   ├── character
     │   │   ├── __init__.py
 	│   │   └── Character.py
+    │   ├── constant
+    │   │   ├── __init__.py
+	│   │   └── constant.py
     │   ├── enemy
     │   │   ├── __init__.py
 	│   │   └── Enemy.py
     │   ├── level
     │   │   ├── __init__.py
+    │   │   ├── Boss.py
 	│   │   └── Level.py
     │   ├── platform
     │   │   ├── __init__.py
 	│   │   └── Platform.py
     │   ├── sql
     │   │   ├── __init__.py
-	│   │   └── Connection.py
+    │   │   ├── Connection.py
+	│   │   └── ProyectoProgramacionAvanzada.db -> Base de datos Sqlite3
     │   └── main.py
 --------
 ### Diagrama de clases
-![Diagrama de clases](img/Diagrama_de_clases.png)
+![Diagrama de clases](img/Diagrama.png)
+
+### Modelo Relacional
+![Modelo relacional](img/MR.png)

@@ -147,3 +147,19 @@ class Connection:
         except Exception as e:
             self.con.rollback()
             return False
+
+    def get_score_level(self, level: int):
+        try:
+            self.cur.execute('SELECT L.id_level, P.nickname, S.score_level FROM LEVEL L \
+                INNER JOIN SCORE S ON S.id_level = L.id_level \
+                INNER JOIN PLAYER P ON P.nickname = S.nickname  \
+                WHERE l.id_level = ? \
+                ORDER BY S.score_level DESC LIMIT 5', (level,))
+            rows = self.cur.fetchall()
+            if rows:
+                return rows
+            else:
+                return None
+        except Exception as e:
+            print(e)
+            return 

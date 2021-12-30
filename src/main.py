@@ -4,8 +4,44 @@ from level.Level import Level
 from constant.constant import *
 from sql.Connection import Connection
 
-def show_puntaje(self):
-    pass
+def get_score_level(level: int, con: Connection, pos_level: tuple):
+    text = ''
+    rows = con.get_score_level(level)
+    text = 'Level: ' +  str(level)
+
+    score_text = FONT_SMALL.render(text , True, (255, 255, 255))
+        
+    SCREEN.blit(score_text, pos_level)
+    coord_x = pos_level[0]
+    coord_y = pos_level[1] + 30
+    if rows:
+        for i in rows:
+            text_2 = 'Nickname: ' + str(i[1].strip()) +  ' Score: ' + str(i[2])
+            score_text_2 = FONT_SMALL.render(text_2, True, (255, 255, 255))
+            SCREEN.blit(score_text_2, (coord_x, coord_y))
+            coord_y += 30
+
+def show_puntaje(con: Connection):
+    finished = False
+    clock = pygame.time.Clock()
+    while not finished:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                finished = True
+            keys = pygame.key.get_pressed()
+            if event.type == pygame.KEYDOWN:
+                if keys[pygame.K_r]:
+                    finished = True
+
+        SCREEN.fill((0, 0, 0))
+        get_score_level(1, con, (50, 50))
+        get_score_level(2, con, (550, 50))
+
+        get_score_level(3, con, (50, 250))
+        get_score_level(4, con, (550, 250))
+        get_score_level(5, con, (50, 450))
+        pygame.display.update()
+        clock.tick(FPS)
 
 def text_box(background) -> str:
     """Permite el ingreso de un nombre de usuario
@@ -54,12 +90,12 @@ def text_box(background) -> str:
         SCREEN.blit(init_text, (270, 680))
         pygame.display.update()
         clock.tick(FPS)
+
     if nickname == '':
         return None
     else:
         return nickname
     
-
 def start_text(background):
     """Imprime el texto de inicio.
 
@@ -104,6 +140,8 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if keys[pygame.K_e]:
                     exit_game = True
+                if keys[pygame.K_p]:
+                    show_puntaje(con)
                 if keys[pygame.K_i]:
                     pygame.mixer.music.stop()
                     n_level = 4

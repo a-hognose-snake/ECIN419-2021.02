@@ -1,36 +1,63 @@
 import pygame
-from bullet.Bullet import Bullet
 from character.Character import Character
 from level.Level import Level
 from constant.constant import *
 from sql.Connection import Connection
 
+def show_puntaje(self):
+    pass
+
 def text_box(background) -> str:
-    """"""
+    """Permite el ingreso de un nombre de usuario
+    
+    Parameters
+    ----------
+    background: Surface
+        Fondo del juego.
+    
+    Returns
+    -------
+    nickname: str  
+        nombre de usuario.
+    """
     clock = pygame.time.Clock()
     base_font = pygame.font.Font(None, 32)
-    user_text = ''
-    input_rect = pygame.Rect(200, 200, 140, 32)
-    color = pygame.Color('lightskyblue3')
+    nickname = ''
+    input_rect = pygame.Rect(270 + 200, 680, 140, 32)
+    active = False
     exit_game = False
+    color = (0,0,0)
     while not exit_game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                     exit_game = True
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if input_rect.collidepoint(event.pos):
+                    active = True
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_BACKSPACE:
-                    user_text = user_text[:-1]
-                else:
-                    user_text += event.unicode
+                if active:
+                    if event.key == pygame.K_BACKSPACE:
+                        nickname = nickname[:-1]
+                    else:
+                        nickname += event.unicode
                 if event.key == pygame.K_RETURN:
                     exit_game = True
+        if active:
+            color = (0, 255, 255)
         SCREEN.blit(background, (0,0))                
         pygame.draw.rect(SCREEN, color, input_rect, 2)
-        text_surface = base_font.render(user_text, True, (255,255,255))  
+        text_surface = base_font.render(nickname, True, (255, 255, 255))  
         SCREEN.blit(text_surface, input_rect)
+
+        init_text = FONT_SMALL.render(
+                "Ingresa tu nickname: ", True, (255, 255, 255))
+        SCREEN.blit(init_text, (270, 680))
         pygame.display.update()
         clock.tick(FPS)
-    return user_text
+    if nickname == '':
+        return None
+    else:
+        return nickname
     
 
 def start_text(background):
@@ -65,10 +92,10 @@ def main():
     score_level = 0
     exit_game = False
     nickname = text_box(background) 
-    if nickname != '' or nickname != ' ':
+    if nickname is not None:
         con.insert_player(nickname)
     else:
-        return
+        exit_game = True
     while not exit_game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -79,7 +106,7 @@ def main():
                     exit_game = True
                 if keys[pygame.K_i]:
                     pygame.mixer.music.stop()
-                    n_level = 4
+                    n_level = 0 
                     character = Character((0,200))
                     while True:
                         level = Level(character, n_level)

@@ -259,7 +259,7 @@ class Level:
                 pygame.mixer.music.load('resources/sounds/hit_bullet_character.mp3')
                 pygame.mixer.music.set_volume(.1)
                 pygame.mixer.music.play()
-                self.character.health -= 20
+                self.character.health -= 25
                 bullet_b.kill()
 
     def collide_bullet_with_boss(self):
@@ -290,7 +290,7 @@ class Level:
                 pygame.mixer.music.set_volume(.1)
                 pygame.mixer.music.play()
                 enemy_c = enemy[key][0]
-                enemy_c.health -= 50
+                enemy_c.health -= 10
                 if enemy_c.health == 0:
                     pygame.mixer.music.load('resources/sounds/enemy_death.mp3')
                     pygame.mixer.music.set_volume(.1)

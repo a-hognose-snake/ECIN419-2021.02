@@ -29,7 +29,6 @@ class Connection:
             self.cur.execute('INSERT INTO player (nickname) VALUES (?)', (nickname,))
             self.con.commit()
         except Exception:
-            print('El nickname ya esta registrado en la base de datos.')
             self.con.rollback()
             return False
     

@@ -61,7 +61,7 @@ def text_box(background) -> str:
     
 
 def start_text(background):
-    """ Imprime el texto de inicio.
+    """Imprime el texto de inicio.
 
     Parameters
     ----------
@@ -91,7 +91,7 @@ def main():
     SCREEN.fill((255, 255, 255))
     score_level = 0
     exit_game = False
-    nickname = text_box(background) 
+    nickname = text_box(background)
     if nickname is not None:
         con.insert_player(nickname)
     else:
@@ -106,7 +106,7 @@ def main():
                     exit_game = True
                 if keys[pygame.K_i]:
                     pygame.mixer.music.stop()
-                    n_level = 0 
+                    n_level = 4
                     character = Character((0,200))
                     while True:
                         level = Level(character, n_level)
